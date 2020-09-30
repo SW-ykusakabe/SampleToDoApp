@@ -9,15 +9,16 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
 
-class TaskCalendarFragment() : Fragment() {
+class TaskCalendarFragment: Fragment() {
     companion object {
-        private val TAG : String = this::class.java.simpleName
+        private val TAG: String = this::class.java.simpleName
     }
+    private lateinit var mFragment: TaskListFragment
 
-    fun newInstance(str: String) : TaskCalendarFragment{
+    fun newInstance(str: String): TaskCalendarFragment {
         val args = Bundle()
         val fragment = TaskCalendarFragment()
-        args.putString("ARGS_NAME", str);
+        args.putString("ARGS_NAME", str)
         fragment.arguments = args
         return fragment
     }
@@ -29,12 +30,13 @@ class TaskCalendarFragment() : Fragment() {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_task_calendar, container, false)
         val args = arguments
-        var array : ArrayList<TaskEntity> = arrayListOf()
+        var array: ArrayList<TaskEntity> = arrayListOf()
         if (args != null) {
-            val str = args.getString("ARGS_NAME")
+//            val str = args.getString("ARGS_NAME")
             array = args.getParcelableArrayList<TaskEntity>("KEY_TASK_LIST") as ArrayList<TaskEntity>
         }
-        replaceFragment(TaskListFragment().newInstance("Fragment"), array)
+        mFragment = TaskListFragment().newInstance("Fragment")
+        replaceFragment(mFragment, array)
 
         return view
     }
@@ -48,5 +50,9 @@ class TaskCalendarFragment() : Fragment() {
         val fragmentTransaction: FragmentTransaction = fragmentManager.beginTransaction()
         fragmentTransaction.replace(R.id.list_container, fragment)
         fragmentTransaction.commit()
+    }
+
+    fun updateAdapter(array: ArrayList<TaskEntity>) {
+        mFragment.updateAdapter(array)
     }
 }

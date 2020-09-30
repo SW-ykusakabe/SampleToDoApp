@@ -17,6 +17,19 @@
         android:background="@color/colorPrimary"
         android:theme="?attr/actionBarTheme" />
 
+    <TextView
+        android:id="@+id/today_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="@+id/toolbar"
+        app:layout_constraintEnd_toStartOf="@+id/toolbar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:paddingHorizontal="@dimen/small_padding"
+        android:text="@string/dummy_hint"
+        android:textColor="@color/colorWhite"
+        android:textSize="@dimen/font_size"/>
+
     <Button
         android:id="@+id/task_add_button"
         android:layout_width="wrap_content"
