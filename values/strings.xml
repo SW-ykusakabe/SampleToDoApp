@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">ToDoApp</string>
+
+    <string name="pulse">+</string>
+
+    <string name="dummy_hint">dummy</string>
+
+    <string name="year">年</string>
+    <string name="month">月</string>
+    <string name="day">日</string>
+    <string name="time">時</string>
+    <string name="minuit">分</string>
+    <string name="time_hint">time</string>
+    <string name="title_hint">title</string>
+
+</resources>
