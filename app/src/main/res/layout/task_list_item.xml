@@ -50,6 +50,8 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="10"
+        android:maxLines="1"
+        android:ellipsize="end"
         android:textSize="36sp"
         android:hint="@string/dummy_hint"/>
 

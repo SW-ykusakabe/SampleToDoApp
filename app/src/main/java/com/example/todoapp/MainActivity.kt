@@ -2,36 +2,36 @@ package com.example.todoapp
 
 import TaskEntity
 import android.os.Bundle
-import android.util.Log
 import android.view.View
-import android.widget.EditText
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
 import kotlinx.android.synthetic.main.activity_main.*
-import java.util.*
+import java.time.LocalDateTime
 
 
-class MainActivity: AppCompatActivity(), View.OnClickListener, TaskListFragment.OnListItemClickImpl {
+class MainActivity: AppCompatActivity(), View.OnClickListener, OnTaskListListener {
     companion object {
-        val TAG: String = object : Any() {}.javaClass.enclosingClass.name
+        private val TAG: String = Util().getClassName(object : Any() {}.javaClass.enclosingClass.name)
     }
-    private lateinit var mTaskArrayList: ArrayList<TaskEntity>
+
+    private lateinit var mAllTaskArrayList: ArrayList<TaskEntity>
+    private lateinit var mSelectedTaskArrayList: ArrayList<TaskEntity>
     private lateinit var mFragmentOnActivity: Fragment
 
-    private val YEAR_FORMAT_PATTERN_ALL: String = "yyyy/MM/dd(E)-HH:mm"
-    private val YEAR_FORMAT_PATTERN_DATE: String = "yyyy/MM/dd(E)"
-    private val YEAR_FORMAT_PATTERN_YYYY: String = "yyyy"
-    private val MONTH_FORMAT_PATTERN_MM: String = "MM"
-    private val DAY_FORMAT_PATTERN_DD: String = "dd"
+    private val FORMAT_PATTERN_DATE_ALL: String = "yyyy/MM/dd(e)-HH:mm"
+    private val FORMAT_PATTERN_DATE: String = "yyyy/MM/dd(e)"
+    private val FORMAT_PATTERN_YYYY: String = "yyyy"
+    private val FORMAT_PATTERN_MM: String = "MM"
+    private val FORMAT_PATTERN_DD: String = "dd"
+    private val FORMAT_PATTERN_TIME: String = "HH:mm"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        today_text.text = Util().getDayTime(YEAR_FORMAT_PATTERN_DATE)
+        today_text.text = Util().getLocalDayTime(LocalDateTime.now(), "yyyy/MM/dd(E)")
 
         // set listener
         task_add_button.setOnClickListener(this)
@@ -40,22 +40,64 @@ class MainActivity: AppCompatActivity(), View.OnClickListener, TaskListFragment.
         setting_button.setOnClickListener(this)
 
         // get data
-        mTaskArrayList = arrayListOf(TaskEntity("10 : 00", "11 : 00", "No Title"))
+        mAllTaskArrayList = arrayListOf(
+            TaskEntity(
+                FORMAT_PATTERN_DATE_ALL,
+                FORMAT_PATTERN_DATE_ALL,
+                "Sample"
+            )
+        )
 
         // fragment
         mFragmentOnActivity = TaskListFragment().newInstance("Fragment")
         replaceFragment(mFragmentOnActivity)
     }
 
-    override fun onListItemClick(position: Int): ArrayList<TaskEntity> {
-        Log.d(TAG, "onListItemClick: pos:${position}")
-        mTaskArrayList.removeAt(position)
-        return  mTaskArrayList
+    override fun getListItem(): ArrayList<TaskEntity> {
+        return  mAllTaskArrayList
+    }
+
+    override fun onCreateListItem(startDate: String, endDate: String, title: String) {
+        DLog(TAG, "onCreateListItem", "startDate:$startDate, endDate:$endDate, title:$title")
+        mAllTaskArrayList.add(TaskEntity(startDate, endDate, title))
+
+        // update list
+        if (mFragmentOnActivity is TaskListFragment) {
+            val fragment = mFragmentOnActivity as TaskListFragment
+            fragment.updateAdapter(mAllTaskArrayList)
+        } else if (mFragmentOnActivity is TaskCalendarFragment) {
+            val fragment = mFragmentOnActivity as TaskCalendarFragment
+            fragment.updateAdapter(mAllTaskArrayList)
+        }
+    }
+
+    override fun onRemoveListItem(position: Int): ArrayList<TaskEntity> {
+        DLog(TAG, "onRemoveListItem", "position:$position")
+        mAllTaskArrayList.removeAt(position)
+        return  mAllTaskArrayList
+    }
+
+    override fun onEditListItem(position: Int): ArrayList<TaskEntity> {
+        DLog(TAG, "onEditListItem", "position:$position")
+        val startTime = mAllTaskArrayList[position].startTime.toString()
+        val endTime = mAllTaskArrayList[position].endTime.toString()
+        DLog(TAG, "onEditListItem", "startTime:${startTime}, endTime:${endTime}")
+
+
+        val args = Bundle()
+        val dialog = TaskCreateDialogFragment()
+        args.putBoolean("EXTRA_EDIT", true)
+        args.putInt("EXTRA_EDIT_POSITION", position)
+        args.putString("EXTRA_START_TIME", startTime)
+        args.putString("EXTRA_END_TIME", endTime)
+        dialog.arguments = args
+        dialog.show(supportFragmentManager, "create")
+        return mAllTaskArrayList
     }
 
     private fun replaceFragment(fragment: Fragment) {
         val bundle = Bundle()
-        bundle.putParcelableArrayList("KEY_TASK_LIST", mTaskArrayList)
+        bundle.putParcelableArrayList("KEY_TASK_LIST", mAllTaskArrayList)
         fragment.arguments = bundle
 
         val fragmentManager: FragmentManager = supportFragmentManager
@@ -67,102 +109,16 @@ class MainActivity: AppCompatActivity(), View.OnClickListener, TaskListFragment.
     override fun onClick(v: View) {
         when (v.id) {
             R.id.task_add_button -> {
-                val builder = AlertDialog.Builder(this)
-                val inflater = this.layoutInflater
-                val dialogView = inflater.inflate(R.layout.add_task_dialog_item, null)
-
-                val year = Util().getDayTime(YEAR_FORMAT_PATTERN_YYYY)
-                val month = Util().getDayTime(MONTH_FORMAT_PATTERN_MM)
-                val day = Util().getDayTime(DAY_FORMAT_PATTERN_DD)
-
-                val startYearEditText = dialogView.findViewById<EditText>(R.id.start_year_edit_text)
-                startYearEditText.setText(year)
-                val startMonthEditText =
-                    dialogView.findViewById<EditText>(R.id.start_month_edit_text)
-                startMonthEditText.setText(month)
-                val startDayEditText = dialogView.findViewById<EditText>(R.id.start_day_edit_text)
-                startDayEditText.setText(day)
-                val startHourEditText = dialogView.findViewById<EditText>(R.id.start_hour_edit_text)
-                val startMinuitEditText =
-                    dialogView.findViewById<EditText>(R.id.start_minuit_edit_text)
-
-                val endYearEditText = dialogView.findViewById<EditText>(R.id.end_year_edit_text)
-                endYearEditText.setText(year)
-                val endMonthEditText = dialogView.findViewById<EditText>(R.id.end_month_edit_text)
-                endMonthEditText.setText(month)
-                val endDayEditText = dialogView.findViewById<EditText>(R.id.end_day_edit_text)
-                endDayEditText.setText(day)
-                val endHourEditText = dialogView.findViewById<EditText>(R.id.end_hour_edit_text)
-                val endMinuitEditText = dialogView.findViewById<EditText>(R.id.end_minuit_edit_text)
-
-                val titleEditText = dialogView.findViewById<EditText>(R.id.dialog_title_text)
-
-                builder.setView(dialogView)
-                    .setTitle("Crate Task")
-                    .setPositiveButton("Crate") { dialog, id ->
-
-                        val dayTimeMaxLength =
-                            resources.getInteger(R.integer.day_and_time_max_length)
-
-                        // append task start time
-                        var startHour = startHourEditText.text.toString()
-                        var startMinuit = startMinuitEditText.text.toString()
-                        startHour = Util().paddingLeftToString(startHour, dayTimeMaxLength)
-                        startMinuit = Util().paddingLeftToString(startMinuit, dayTimeMaxLength)
-                        val startTime = "$startHour : $startMinuit"
-
-                        // append task end time
-                        var endHour = endHourEditText.text.toString()
-                        if (endHour.isEmpty()) {
-                            endHour = "${(startHour.toInt() + 1) % 24}"
-                        }
-                        var endMinuit = endMinuitEditText.text.toString()
-                        if (endMinuit.isEmpty()) {
-                            endMinuit = startMinuit
-                        }
-                        endHour = Util().paddingLeftToString(endHour, dayTimeMaxLength)
-                        endMinuit = Util().paddingLeftToString(endMinuit, dayTimeMaxLength)
-                        val endTime = "$endHour : $endMinuit"
-
-                        // title
-                        var title = titleEditText.text.toString()
-                        if (title.isEmpty()) {
-                            title = "No Title"
-                        }
-
-                        val startYear = startYearEditText.text.toString()
-                        val startMonth = startMonthEditText.text.toString()
-                        val startDay = startDayEditText.text.toString()
-                        val startWeek = Util().getWeek(startYear.toInt(), startMonth.toInt(), startDay.toInt())
-                        val startDate = "${startYear}/${startMonth}/${startDay}(${startWeek})-${startHour}:${startMinuit}"
-
-                        val endYear = endYearEditText.text.toString()
-                        val endMonth = endMonthEditText.text.toString()
-                        val endDay = endDayEditText.text.toString()
-                        val endWeek = Util().getWeek(endYear.toInt(), endMonth.toInt(), endDay.toInt())
-                        val endDate = "${endYear}/${endMonth}/${endDay}(${endWeek})-${endHour}:${endMinuit}"
-
-                        Log.d(TAG, "startTime:$startTime, endTime:$endTime, title:$title")
-                        mTaskArrayList.add(TaskEntity(startTime, endTime, title))
-
-                        // update list
-                        if (mFragmentOnActivity is TaskListFragment) {
-                            val fragment = mFragmentOnActivity as TaskListFragment
-                            fragment.updateAdapter(mTaskArrayList)
-                        } else if (mFragmentOnActivity is TaskCalendarFragment) {
-                            val fragment = mFragmentOnActivity as TaskCalendarFragment
-                            fragment.updateAdapter(mTaskArrayList)
-                        }
-                    }
-                    .setNegativeButton("Cancel") { dialog, id ->
-
-                    }
-                builder.create()
-                builder.show()
+                val args = Bundle()
+                val dialog = TaskCreateDialogFragment()
+                args.putBoolean("EDIT", false)
+                dialog.arguments = args
+                dialog.show(supportFragmentManager, "create")
             }
             R.id.calendar_day_button -> {
                 mFragmentOnActivity = TaskListFragment().newInstance("Fragment")
                 replaceFragment(mFragmentOnActivity)
+                today_text.text = Util().getLocalDayTime(LocalDateTime.now(), FORMAT_PATTERN_DATE)
             }
             R.id.calendar_week_button -> {
                 mFragmentOnActivity = TaskCalendarFragment().newInstance("Fragment")

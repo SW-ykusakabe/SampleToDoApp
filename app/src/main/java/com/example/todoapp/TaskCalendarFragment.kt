@@ -11,7 +11,7 @@ import androidx.fragment.app.FragmentTransaction
 
 class TaskCalendarFragment: Fragment() {
     companion object {
-        private val TAG: String = this::class.java.simpleName
+        private val TAG: String = Util().getClassName(object : Any() {}.javaClass.enclosingClass.name)
     }
     private lateinit var mFragment: TaskListFragment
 

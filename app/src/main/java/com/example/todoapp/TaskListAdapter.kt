@@ -8,9 +8,9 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.TextView
 
-class TaskListAdapter(context: Context, private var mTaskList: List<TaskEntity>): ArrayAdapter<TaskEntity>(context, 0, mTaskList) {
+class TaskListAdapter(context: Context, private var mTaskList: ArrayList<TaskEntity>): ArrayAdapter<TaskEntity>(context, 0, mTaskList) {
     companion object {
-        private val TAG: String = this::class.java.simpleName
+        private val TAG: String = Util().getClassName(object : Any() {}.javaClass.enclosingClass.name)
     }
     private val layoutInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
 
@@ -23,11 +23,10 @@ class TaskListAdapter(context: Context, private var mTaskList: List<TaskEntity>)
         }
 
         val startTime = view?.findViewById<TextView>(R.id.start_time_text)
-        // yyyy/MM/dd(E)-HH:mm
-        startTime?.text = task.startTime
+        startTime?.text = Util().insertWhitespace(task.startTime.toString())
 
         val endTime = view?.findViewById<TextView>(R.id.end_time_text)
-        endTime?.text = task.endTime
+        endTime?.text = Util().insertWhitespace(task.endTime.toString())
 
         val title = view?.findViewById<TextView>(R.id.title_list_item_text)
         title?.text = task.title
@@ -35,7 +34,7 @@ class TaskListAdapter(context: Context, private var mTaskList: List<TaskEntity>)
         return view!!
     }
 
-    fun updateAnimalList(taskList: List<TaskEntity>) {
+    fun updateAnimalList(taskList: ArrayList<TaskEntity>) {
         mTaskList = taskList
         // 再描画
         notifyDataSetChanged()
