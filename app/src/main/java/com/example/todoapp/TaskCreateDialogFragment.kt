@@ -10,19 +10,30 @@ import java.util.*
 
 class TaskCreateDialogFragment: DialogFragment() {
     companion object {
-        private val TAG: String = Util().getClassName(object :
+        private val TAG: String = Util.getClassName(object :
             Any() {}.javaClass.enclosingClass.name)
     }
 
     private val FORMAT_PATTERN_DATE_ALL: String = "yyyy/MM/dd(e)-HH:mm"
-    private val FORMAT_PATTERN_DATE: String = "yyyy/MM/dd(e)"
-    private val FORMAT_PATTERN_YYYY: String = "yyyy"
-    private val FORMAT_PATTERN_MM: String = "MM"
-    private val FORMAT_PATTERN_DD: String = "dd"
-    private val FORMAT_PATTERN_TIME: String = "HH:mm"
+    private val KEY_ARGS_EDIT: String = "EXTRA_EDIT"
+    private val KEY_ARGS_EDIT_POSITION: String = "EXTRA_EDIT_POSITION"
+    private val KEY_ARGS_START_TIME: String = "EXTRA_START_TIME"
+    private val KEY_ARGS_END_TIME: String = "EXTRA_END_TIME"
+    private val KEY_ARGS_TITLE: String = "EXTRA_TITLE"
 
     private lateinit var mTaskListListener: OnTaskListListener
 
+    fun newInstance(isEdit: Boolean, pos: Int, startTime: String, endTime: String, title: String): TaskCreateDialogFragment {
+        val args = Bundle()
+        val fragment = TaskCreateDialogFragment()
+        args.putBoolean(KEY_ARGS_EDIT, isEdit)
+        args.putInt(KEY_ARGS_EDIT_POSITION, pos)
+        args.putString(KEY_ARGS_START_TIME, startTime)
+        args.putString(KEY_ARGS_END_TIME, endTime)
+        args.putString(KEY_ARGS_TITLE, title)
+        fragment.arguments = args
+        return fragment
+    }
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         mTaskListListener = context as OnTaskListListener
 
@@ -50,33 +61,35 @@ class TaskCreateDialogFragment: DialogFragment() {
         var editPosition = -1
 
         if (args != null) {
-            isEdit = args.getBoolean("EXTRA_EDIT", false)
-            editPosition = args.getInt("EXTRA_EDIT_POSITION", -1)
+            isEdit = args.getBoolean(KEY_ARGS_EDIT, false)
+            editPosition = args.getInt(KEY_ARGS_EDIT_POSITION, -1)
 
             val startTime = args.getString(
-                "EXTRA_START_TIME", Util().getLocalDayTime(
+                KEY_ARGS_START_TIME, Util.toString(
                     LocalDateTime.now(),
                     FORMAT_PATTERN_DATE_ALL
                 )
             ).toString()
-            startYearEditText.setText(Util().extractionToYear(startTime))
-            startMonthEditText.setText(Util().extractionToMonth(startTime))
-            startDayEditText.setText(Util().extractionToDay(startTime))
+            startYearEditText.setText(Util.extractToYear(startTime))
+            startMonthEditText.setText(Util.extractToMonth(startTime))
+            startDayEditText.setText(Util.extractToDay(startTime))
 
             val endTime = args.getString(
-                "EXTRA_END_TIME",
-                Util().getLocalDayTime(LocalDateTime.now(), FORMAT_PATTERN_DATE_ALL)
+                KEY_ARGS_END_TIME,
+                Util.toString(LocalDateTime.now(), FORMAT_PATTERN_DATE_ALL)
             ).toString()
-            endYearEditText.setText(Util().extractionToYear(endTime))
-            endMonthEditText.setText(Util().extractionToMonth(endTime))
-            endDayEditText.setText(Util().extractionToDay(endTime))
+            endYearEditText.setText(Util.extractToYear(endTime))
+            endMonthEditText.setText(Util.extractToMonth(endTime))
+            endDayEditText.setText(Util.extractToDay(endTime))
 
             if (isEdit) {
-                startHourEditText.setText(Util().extractionToHour(startTime))
-                startMinuitEditText.setText(Util().extractionToMinuit(startTime))
+                startHourEditText.setText(Util.extractToHour(startTime))
+                startMinuitEditText.setText(Util.extractToMinuit(startTime))
 
-                endHourEditText.setText(Util().extractionToHour(endTime))
-                endMinuitEditText.setText(Util().extractionToMinuit(endTime))
+                endHourEditText.setText(Util.extractToHour(endTime))
+                endMinuitEditText.setText(Util.extractToMinuit(endTime))
+
+                titleEditText.setText(args.getString(KEY_ARGS_TITLE))
             }
             DLog(TAG, "onCreateDialog", "startTime:${startTime}, endTime:${endTime}")
         }
@@ -91,16 +104,17 @@ class TaskCreateDialogFragment: DialogFragment() {
                 val startYear = startYearEditText.text.toString()
                 val startMonth = startMonthEditText.text.toString()
                 val startDay = startDayEditText.text.toString()
-                val startWeek = Util().getWeek(
+                val startWeek = Util.getWeekAsInt(
                     startYear.toInt(),
                     startMonth.toInt(),
                     startDay.toInt()
                 )
                 var startHour = startHourEditText.text.toString()
                 var startMinuit = startMinuitEditText.text.toString()
-                startHour = Util().paddingLeftToString(startHour, dayTimeMaxLength)
-                startMinuit = Util().paddingLeftToString(startMinuit, dayTimeMaxLength)
+                startHour = Util.paddingLeftToString(startHour, dayTimeMaxLength)
+                startMinuit = Util.paddingLeftToString(startMinuit, dayTimeMaxLength)
                 val startDate = "${startYear}/${startMonth}/${startDay}(${startWeek})-$startHour:$startMinuit"
+                val startLocalDateTime = Util.toLocalDateTime(startDate, FORMAT_PATTERN_DATE_ALL)
                 val startCalendar: Calendar = Calendar.getInstance()
                 startCalendar.set(startYear.toInt(), startMonth.toInt() - 1, startDay.toInt(),startHour.toInt(), startMinuit.toInt())
 
@@ -108,29 +122,26 @@ class TaskCreateDialogFragment: DialogFragment() {
                 val endYear = endYearEditText.text.toString()
                 val endMonth = endMonthEditText.text.toString()
                 var endDay = endDayEditText.text.toString()
-                val endWeek = Util().getWeek(endYear.toInt(), endMonth.toInt(), endDay.toInt())
+                var endWeek = Util.getWeekAsInt(endYear.toInt(), endMonth.toInt(), endDay.toInt())
                 var endHour = endHourEditText.text.toString()
                 if (endHour.isEmpty()) {
-
-                    val localDateTime = Util().toLocalDateTime(startCalendar.time)
-                    val time = Util().getLocalDayTime(localDateTime, FORMAT_PATTERN_DATE_ALL)
-
-                    endDay = startCalendar.add(Calendar.DAY_OF_MONTH, 1).toString()
-                    DLog(TAG, "", "endDay:${endDay}")
-                    endDay = Util().paddingLeftToString(endDay, dayTimeMaxLength)
-                    DLog(TAG, "", "hour:${startCalendar.get(Calendar.HOUR_OF_DAY)}")
-                    DLog(TAG, "", "hour:${startCalendar.add(Calendar.HOUR_OF_DAY, -1)}")
-                    endHour = startCalendar.add(Calendar.HOUR_OF_DAY, -1).toString()
-                    DLog(TAG, "", "hour:$endHour")
-//                        "${(startHour.toInt() + 1) % 24}"
+                    // TODO :
+//                    startCalendar.add(Calendar.DAY_OF_MONTH, 1)
+//                    startCalendar.add(Calendar.HOUR_OF_DAY, 1)
+//                    endWeek += 1
+//                    val endTime = Util.toString(startCalendar.time, FORMAT_PATTERN_DATE_ALL)
+//                    endDay = Util.extractToDay(endTime)
+//                    endDay = Util.paddingLeftToString(endDay, dayTimeMaxLength)
+//                    endHour = Util.extractToHour(endTime)
                 }
+                endHour = Util.paddingLeftToString(endHour, dayTimeMaxLength)
                 var endMinuit = endMinuitEditText.text.toString()
                 if (endMinuit.isEmpty()) {
                     endMinuit = startMinuit
                 }
-                endHour = Util().paddingLeftToString(endHour, dayTimeMaxLength)
-                endMinuit = Util().paddingLeftToString(endMinuit, dayTimeMaxLength)
+                endMinuit = Util.paddingLeftToString(endMinuit, dayTimeMaxLength)
                 val endDate = "${endYear}/${endMonth}/${endDay}(${endWeek})-$endHour:$endMinuit"
+                val endLocalDateTime = Util.toLocalDateTime(endDate, FORMAT_PATTERN_DATE_ALL)
                 val endCalendar: Calendar = Calendar.getInstance()
 //                endCalendar.set(endYear.toInt(), endMonth.toInt(), endDay.toInt(),endHour.toInt(), endMinuit.toInt())
 
@@ -143,7 +154,7 @@ class TaskCreateDialogFragment: DialogFragment() {
                 if (isEdit) {
                     mTaskListListener.onRemoveListItem(editPosition)
                 }
-                mTaskListListener.onCreateListItem(startDate, endDate, title)
+                mTaskListListener.onCreateListItem(startLocalDateTime, endLocalDateTime, title)
             }
             .setNegativeButton("Cancel") { dialog, id ->
             }

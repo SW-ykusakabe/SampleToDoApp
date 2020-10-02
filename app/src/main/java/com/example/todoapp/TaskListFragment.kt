@@ -13,16 +13,17 @@ import androidx.fragment.app.Fragment
 
 class TaskListFragment: Fragment(), AdapterView.OnItemClickListener, AdapterView.OnItemLongClickListener {
     companion object {
-        private val TAG: String = Util().getClassName(object : Any() {}.javaClass.enclosingClass.name)
+        private val TAG: String = Util.getClassName(object : Any() {}.javaClass.enclosingClass.name)
     }
+    private val KYE_ARGS_TASK_LIST: String = "ARGS_TASK_LIST"
 
     private lateinit var mTaskListAdapter: TaskListAdapter
     private lateinit var mTaskListListener: OnTaskListListener
 
-    fun newInstance(str: String): TaskListFragment {
+    fun newInstance(array: ArrayList<TaskEntity>): TaskListFragment {
         val args = Bundle()
         val fragment = TaskListFragment()
-        args.putString("ARGS_NAME", str)
+        args.putParcelableArrayList(KYE_ARGS_TASK_LIST, array)
         fragment.arguments = args
         return fragment
     }
@@ -37,8 +38,7 @@ class TaskListFragment: Fragment(), AdapterView.OnItemClickListener, AdapterView
         val args = arguments
         var array: ArrayList<TaskEntity> = arrayListOf()
         if (args != null) {
-//            val str = args.getString("ARGS_NAME")
-            array = args.getParcelableArrayList<TaskEntity>("KEY_TASK_LIST") as ArrayList<TaskEntity>
+            array = args.getParcelableArrayList<TaskEntity>(KYE_ARGS_TASK_LIST) as ArrayList<TaskEntity>
         }
 
         // set list view

@@ -5,20 +5,24 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.CalendarView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
 
-class TaskCalendarFragment: Fragment() {
+class TaskCalendarFragment: Fragment(), CalendarView.OnDateChangeListener {
     companion object {
-        private val TAG: String = Util().getClassName(object : Any() {}.javaClass.enclosingClass.name)
+        private val TAG: String = Util.getClassName(object : Any() {}.javaClass.enclosingClass.name)
     }
+    private val KYE_ARGS_TASK_LIST: String = "ARGS_TASK_LIST"
+
+    private lateinit var mTaskListListener: OnTaskListListener
     private lateinit var mFragment: TaskListFragment
 
-    fun newInstance(str: String): TaskCalendarFragment {
+    fun newInstance(array: ArrayList<TaskEntity>): TaskCalendarFragment {
         val args = Bundle()
         val fragment = TaskCalendarFragment()
-        args.putString("ARGS_NAME", str)
+        args.putParcelableArrayList(KYE_ARGS_TASK_LIST, array)
         fragment.arguments = args
         return fragment
     }
@@ -28,24 +32,27 @@ class TaskCalendarFragment: Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        mTaskListListener = context as OnTaskListListener
         val view = inflater.inflate(R.layout.fragment_task_calendar, container, false)
         val args = arguments
         var array: ArrayList<TaskEntity> = arrayListOf()
         if (args != null) {
-//            val str = args.getString("ARGS_NAME")
-            array = args.getParcelableArrayList<TaskEntity>("KEY_TASK_LIST") as ArrayList<TaskEntity>
+            array = args.getParcelableArrayList<TaskEntity>(KYE_ARGS_TASK_LIST) as ArrayList<TaskEntity>
         }
-        mFragment = TaskListFragment().newInstance("Fragment")
-        replaceFragment(mFragment, array)
+        mFragment = TaskListFragment().newInstance(array)
+        replaceFragment(mFragment)
 
+        val calendarView = view.findViewById<CalendarView>(R.id.calendar_view)
+        calendarView.setOnDateChangeListener(this)
         return view
     }
 
-    private fun replaceFragment(fragment: Fragment, arrayList: ArrayList<TaskEntity>) {
-        val bundle = Bundle()
-        bundle.putParcelableArrayList("KEY_TASK_LIST", arrayList)
-        fragment.arguments = bundle
+    override fun onSelectedDayChange(view: CalendarView, year: Int, month: Int, dayOfMonth: Int) {
+        DLog(TAG, "onSelectedDayChange", "year:$year, month:${month + 1}, dayOfMonth:$dayOfMonth")
+        mTaskListListener.onChangeListItem(year, month + 1, dayOfMonth)
+    }
 
+    private fun replaceFragment(fragment: Fragment) {
         val fragmentManager: FragmentManager = childFragmentManager
         val fragmentTransaction: FragmentTransaction = fragmentManager.beginTransaction()
         fragmentTransaction.replace(R.id.list_container, fragment)

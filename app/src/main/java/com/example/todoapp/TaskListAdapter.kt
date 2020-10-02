@@ -10,8 +10,9 @@ import android.widget.TextView
 
 class TaskListAdapter(context: Context, private var mTaskList: ArrayList<TaskEntity>): ArrayAdapter<TaskEntity>(context, 0, mTaskList) {
     companion object {
-        private val TAG: String = Util().getClassName(object : Any() {}.javaClass.enclosingClass.name)
+        private val TAG: String = Util.getClassName(object : Any() {}.javaClass.enclosingClass.name)
     }
+    private val FORMAT_PATTERN_DATE_ALL: String = "yyyy/MM/dd(e)-HH:mm"
     private val layoutInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
@@ -23,10 +24,12 @@ class TaskListAdapter(context: Context, private var mTaskList: ArrayList<TaskEnt
         }
 
         val startTime = view?.findViewById<TextView>(R.id.start_time_text)
-        startTime?.text = Util().insertWhitespace(task.startTime.toString())
+        var str = Util.extractToTime(Util.toString(task.startTime, FORMAT_PATTERN_DATE_ALL))
+        startTime?.text = Util.insertWhitespace(str)
 
         val endTime = view?.findViewById<TextView>(R.id.end_time_text)
-        endTime?.text = Util().insertWhitespace(task.endTime.toString())
+        str = Util.extractToTime(Util.toString(task.endTime, FORMAT_PATTERN_DATE_ALL))
+        endTime?.text = Util.insertWhitespace(str)
 
         val title = view?.findViewById<TextView>(R.id.title_list_item_text)
         title?.text = task.title

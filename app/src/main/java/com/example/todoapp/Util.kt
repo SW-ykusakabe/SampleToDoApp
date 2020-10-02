@@ -6,52 +6,74 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.*
 
-class Util {
-    companion object {
-        private val TAG: String = Util().getClassName(object :
-            Any() {}.javaClass.enclosingClass.name)
-    }
+
+object Util {
+    private val TAG: String = getClassName(object : Any() {}.javaClass.enclosingClass.name)
 
     fun getClassName(str: String): String {
         val ret = str.split(".")
         return ret[ret.size - 1]
     }
 
-    fun getLocalDayTime(localDateTime: LocalDateTime,  formatStr: String): String {
+    /**
+     * getCurrentLocalDateTime
+     * @return LocalDateTime
+     */
+    fun getCurrentLocalDateTime(): LocalDateTime {
+        return LocalDateTime.now()
+    }
+
+    /**
+     * toLocalDateTime
+     * @param date
+     * @param formatStr format
+     * @return LocalDateTime
+     */
+    fun toLocalDateTime(date: String, formatStr: String): LocalDateTime {
+        val formatter = DateTimeFormatter.ofPattern(formatStr)
+        return LocalDateTime.parse(date, formatter)
+    }
+
+    fun toString(localDateTime: LocalDateTime, formatStr: String): String {
         val formatter = DateTimeFormatter.ofPattern(formatStr)
         return localDateTime.format(formatter)
     }
 
-    fun toLocalDateTime(date: Date): LocalDateTime {
+    fun toString(date: Date, formatStr: String): String {
         val instant: Instant = date.toInstant()
-        return LocalDateTime.ofInstant(instant, ZoneId.systemDefault())
+        val localDateTime = LocalDateTime.ofInstant(instant, ZoneId.systemDefault())
+        return this.toString(localDateTime, formatStr)
     }
 
-    fun getWeek(year: Int, month: Int, day: Int): String {
+    fun getWeekAsInt(year: Int, month: Int, day: Int): Int {
         val cal = Calendar.getInstance()
         cal.set(year, month - 1, day)
+        return cal.get(Calendar.DAY_OF_WEEK)
+    }
+
+    fun getWeekAsString(year: Int, month: Int, day: Int): String {
         val ret: String
-        when (cal.get(Calendar.DAY_OF_WEEK)) {
+        when (getWeekAsInt(year, month, day)) {
             Calendar.SUNDAY -> {
-                ret = "日"
+                ret = "Sun"
             }
             Calendar.MONDAY -> {
-                ret = "月"
+                ret = "Mon"
             }
             Calendar.TUESDAY -> {
-                ret = "火"
+                ret = "Tue"
             }
             Calendar.WEDNESDAY -> {
-                ret = "水"
+                ret = "Wed"
             }
             Calendar.THURSDAY -> {
-                ret = "木"
+                ret = "The"
             }
             Calendar.FRIDAY -> {
-                ret = "金"
+                ret = "Fri"
             }
             Calendar.SATURDAY -> {
-                ret = "土"
+                ret = "Sat"
             }
             else -> {
                 ret = "n"
@@ -60,37 +82,36 @@ class Util {
         return ret
     }
 
-    fun extractionToYear(str: String): String {
+    fun extractToYear(str: String): String {
         return str.substring(0, 4)
     }
 
-    fun extractionToMonth(str: String): String {
+    fun extractToMonth(str: String): String {
         return str.substring(5, 7)
     }
 
-    fun extractionToDay(str: String): String {
+    fun extractToDay(str: String): String {
         return str.substring(8, 10)
     }
 
-    fun extractionToWeek(str: String): String {
+    fun extractToWeek(str: String): String {
         return str.substring(11, 12)
     }
 
-    fun extractionToHour(str: String): String {
+    fun extractToHour(str: String): String {
         return str.substring(14, 16)
     }
 
-    fun extractionToMinuit(str: String): String {
-        return str.substring(17, 19)
+    fun extractToMinuit(str: String): String {
+        return str.substring(17)
     }
 
-    fun extractionToTime(str: String): String {
-        // yyyy/mm/dd(u)-hh:mm
-        return str.substring(14, 19)
+    fun extractToTime(str: String): String {
+        return str.substring(14)
     }
 
     fun insertWhitespace(str: String): String {
-        val ret = StringBuilder(this.extractionToTime(str))
+        val ret = StringBuilder(str)
         ret.insert(3, " ")
         ret.insert(2, " ")
         return ret.toString()
