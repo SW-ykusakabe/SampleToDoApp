@@ -9,6 +9,7 @@ import android.widget.CalendarView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
+import java.time.LocalDateTime
 
 class TaskCalendarFragment: Fragment(), CalendarView.OnDateChangeListener {
     companion object {
@@ -50,6 +51,7 @@ class TaskCalendarFragment: Fragment(), CalendarView.OnDateChangeListener {
     override fun onSelectedDayChange(view: CalendarView, year: Int, month: Int, dayOfMonth: Int) {
         DLog(TAG, "onSelectedDayChange", "year:$year, month:${month + 1}, dayOfMonth:$dayOfMonth")
         mTaskListListener.onChangeListItem(year, month + 1, dayOfMonth)
+        mFragment.setSelectTime(LocalDateTime.of(year, month, dayOfMonth, 0, 0))
     }
 
     private fun replaceFragment(fragment: Fragment) {

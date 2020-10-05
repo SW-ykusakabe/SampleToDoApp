@@ -25,7 +25,7 @@ object Util {
 
     /**
      * toLocalDateTime
-     * @param date
+     * @param date string date data
      * @param formatStr format
      * @return LocalDateTime
      */
@@ -34,11 +34,23 @@ object Util {
         return LocalDateTime.parse(date, formatter)
     }
 
+    /**
+     * toString
+     * @param localDateTime LocalDateTime
+     * @param formatStr format
+     * @return LocalDateTime String
+     */
     fun toString(localDateTime: LocalDateTime, formatStr: String): String {
         val formatter = DateTimeFormatter.ofPattern(formatStr)
         return localDateTime.format(formatter)
     }
 
+    /**
+     * toString
+     * @param date data
+     * @param formatStr format
+     * @return Date String
+     */
     fun toString(date: Date, formatStr: String): String {
         val instant: Instant = date.toInstant()
         val localDateTime = LocalDateTime.ofInstant(instant, ZoneId.systemDefault())

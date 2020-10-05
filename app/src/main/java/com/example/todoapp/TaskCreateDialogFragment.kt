@@ -125,14 +125,18 @@ class TaskCreateDialogFragment: DialogFragment() {
                 var endWeek = Util.getWeekAsInt(endYear.toInt(), endMonth.toInt(), endDay.toInt())
                 var endHour = endHourEditText.text.toString()
                 if (endHour.isEmpty()) {
-                    // TODO :
-//                    startCalendar.add(Calendar.DAY_OF_MONTH, 1)
-//                    startCalendar.add(Calendar.HOUR_OF_DAY, 1)
-//                    endWeek += 1
-//                    val endTime = Util.toString(startCalendar.time, FORMAT_PATTERN_DATE_ALL)
-//                    endDay = Util.extractToDay(endTime)
-//                    endDay = Util.paddingLeftToString(endDay, dayTimeMaxLength)
-//                    endHour = Util.extractToHour(endTime)
+                    startCalendar.add(Calendar.HOUR_OF_DAY, 1)
+                    val endTime = Util.toString(startCalendar.time, FORMAT_PATTERN_DATE_ALL)
+
+                    endDay = Util.extractToDay(endTime)
+                    endDay = Util.paddingLeftToString(endDay, dayTimeMaxLength)
+
+                    val year = Util.extractToYear(endTime)
+                    val month = Util.extractToMonth(endTime)
+                    val day = Util.extractToDay(endTime)
+                    endWeek = Util.getWeekAsInt(year.toInt(), month.toInt(), day.toInt())
+
+                    endHour = Util.extractToHour(endTime)
                 }
                 endHour = Util.paddingLeftToString(endHour, dayTimeMaxLength)
                 var endMinuit = endMinuitEditText.text.toString()
@@ -142,8 +146,6 @@ class TaskCreateDialogFragment: DialogFragment() {
                 endMinuit = Util.paddingLeftToString(endMinuit, dayTimeMaxLength)
                 val endDate = "${endYear}/${endMonth}/${endDay}(${endWeek})-$endHour:$endMinuit"
                 val endLocalDateTime = Util.toLocalDateTime(endDate, FORMAT_PATTERN_DATE_ALL)
-                val endCalendar: Calendar = Calendar.getInstance()
-//                endCalendar.set(endYear.toInt(), endMonth.toInt(), endDay.toInt(),endHour.toInt(), endMinuit.toInt())
 
                 // title
                 var title = titleEditText.text.toString()

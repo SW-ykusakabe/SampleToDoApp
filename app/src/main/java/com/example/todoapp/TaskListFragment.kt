@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ListView
 import androidx.fragment.app.Fragment
+import java.time.LocalDateTime
 
 
 class TaskListFragment: Fragment(), AdapterView.OnItemClickListener, AdapterView.OnItemLongClickListener {
@@ -47,6 +48,7 @@ class TaskListFragment: Fragment(), AdapterView.OnItemClickListener, AdapterView
         listView.onItemLongClickListener = this
         mTaskListAdapter = TaskListAdapter(view.context, array)
         listView.adapter = mTaskListAdapter
+        mTaskListAdapter.setSelectTime(Util.getCurrentLocalDateTime())
 
         return view
     }
@@ -83,6 +85,9 @@ class TaskListFragment: Fragment(), AdapterView.OnItemClickListener, AdapterView
 
     fun updateAdapter(array: ArrayList<TaskEntity>) {
         mTaskListAdapter.updateAnimalList(array)
+    }
 
+    fun setSelectTime(selectTime: LocalDateTime) {
+        mTaskListAdapter.setSelectTime(selectTime)
     }
 }
