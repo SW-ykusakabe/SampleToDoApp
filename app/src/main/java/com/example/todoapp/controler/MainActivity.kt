@@ -1,12 +1,17 @@
-package com.example.todoapp
+package com.example.todoapp.controler
 
-import TaskEntity
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
+import com.example.todoapp.*
+import com.example.todoapp.entitys.TaskEntity
+import com.example.todoapp.entitys.Tasks
+import com.example.todoapp.models.AppDatabase
+import com.example.todoapp.utils.DLog
+import com.example.todoapp.utils.Util
 import kotlinx.android.synthetic.main.activity_main.*
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
@@ -25,18 +30,33 @@ class MainActivity: AppCompatActivity(), View.OnClickListener, OnTaskListListene
 
     private val FORMAT_PATTERN_DATE_ALL: String = "yyyy/MM/dd(e)-HH:mm"
     private val FORMAT_PATTERN_DATE_WEEK: String = "yyyy/MM/dd(E)"
-    private val FORMAT_PATTERN_DATE: String = "yyyy/MM/dd"
-    private val FORMAT_PATTERN_YYYY: String = "yyyy"
-    private val FORMAT_PATTERN_MM: String = "MM"
-    private val FORMAT_PATTERN_DD: String = "dd"
-    private val FORMAT_PATTERN_TIME: String = "HH:mm"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         val currentTimeLocalDateTime = Util.getCurrentLocalDateTime()
-        today_text.text = Util.toString(currentTimeLocalDateTime, FORMAT_PATTERN_DATE)
+        today_text.text = Util.toString(currentTimeLocalDateTime, FORMAT_PATTERN_DATE_WEEK)
+
+        // get data
+        val data = AppDatabase.getInstance(this)
+        val taskDao = data.taskDao()
+        taskDao.deleteAll()
+        taskDao.insert(Tasks(0, "2020/10/05(2)-12:00", "2020/10/06(3)-19:00", "Sample Title"))
+        taskDao.insert(Tasks(0, "2020/10/06(3)-12:00", "2020/10/06(3)-19:00", "Sample Title"))
+        taskDao.insert(Tasks(0, "2020/10/06(3)-13:00", "2020/10/07(4)-19:00", "Sample Title"))
+        taskDao.insert(Tasks(0, "2020/10/07(4)-13:00", "2020/10/07(4)-19:00", "Sample Title"))
+        val array = taskDao.getAll()
+
+        mAllTaskArrayList = arrayListOf()
+        for (i in array.indices) {
+            mAllTaskArrayList.add(
+                TaskEntity(
+                    Util.toLocalDateTime(array[i].startTime, FORMAT_PATTERN_DATE_ALL)
+                    , Util.toLocalDateTime(array[i].endTime, FORMAT_PATTERN_DATE_ALL)
+                    ,array[i].title)
+            )
+        }
 
         // set listener
         task_add_button.setOnClickListener(this)
@@ -44,42 +64,27 @@ class MainActivity: AppCompatActivity(), View.OnClickListener, OnTaskListListene
         calendar_week_button.setOnClickListener(this)
         setting_button.setOnClickListener(this)
 
-        // get data
-        mAllTaskArrayList = arrayListOf()
-        var startLocalDateTime = Util.toLocalDateTime("2020/10/04(1)-12:00", FORMAT_PATTERN_DATE_ALL)
-        var endLocalDateTime = Util.toLocalDateTime("2020/10/05(2)-19:00", FORMAT_PATTERN_DATE_ALL)
-        mAllTaskArrayList.add(TaskEntity(startLocalDateTime, endLocalDateTime, "Sample Title"))
-
-        startLocalDateTime = Util.toLocalDateTime("2020/10/05(2)-11:00", FORMAT_PATTERN_DATE_ALL)
-        endLocalDateTime = Util.toLocalDateTime("2020/10/05(2)-19:00", FORMAT_PATTERN_DATE_ALL)
-        mAllTaskArrayList.add(TaskEntity(startLocalDateTime, endLocalDateTime, "Sample Title"))
         sortList(mAllTaskArrayList)
 
         mSelectedTaskArrayList = arrayListOf()
-        val currentTimeLocalDateTimeDays = currentTimeLocalDateTime.truncatedTo(ChronoUnit.DAYS)
-        for (i in 0 until mAllTaskArrayList.size) {
-            if(currentTimeLocalDateTimeDays.isAfter(mAllTaskArrayList[i].startTime)
-                || currentTimeLocalDateTimeDays.isBefore(mAllTaskArrayList[i].endTime)) {
-                mSelectedTaskArrayList.add(mAllTaskArrayList[i])
-            }
-        }
+        extractTasks(currentTimeLocalDateTime)
 
         // fragment
         mFragmentOnActivity = TaskListFragment().newInstance(mSelectedTaskArrayList)
         replaceFragment(mFragmentOnActivity)
     }
 
-    override fun getListItem(): ArrayList<TaskEntity> {
-        return  mSelectedTaskArrayList
-    }
-
     override fun onCreateListItem(startDate: LocalDateTime, endDate: LocalDateTime, title: String) {
         DLog(TAG, "onCreateListItem", "startDate:$startDate, endDate:$endDate, title:$title")
         mAllTaskArrayList.add(TaskEntity(startDate, endDate, title))
         sortList(mAllTaskArrayList)
+
         val currentTimeLocalDateTime = Util.getCurrentLocalDateTime()
-        val currentTimeString = Util.toString(currentTimeLocalDateTime, FORMAT_PATTERN_DATE)
-        if (Util.toString(startDate, FORMAT_PATTERN_DATE) == currentTimeString) {
+        val truncateSelectedDateToDays = currentTimeLocalDateTime.truncatedTo(ChronoUnit.DAYS)
+        if ((truncateSelectedDateToDays.isEqual(startDate.truncatedTo(ChronoUnit.DAYS))
+                    || truncateSelectedDateToDays.isAfter(startDate))
+            && (truncateSelectedDateToDays.isEqual(endDate.truncatedTo((ChronoUnit.DAYS)))
+                    || truncateSelectedDateToDays.isBefore(endDate))) {
             mSelectedTaskArrayList.add(TaskEntity(startDate, endDate, title))
             sortList(mSelectedTaskArrayList)
         }
@@ -90,12 +95,17 @@ class MainActivity: AppCompatActivity(), View.OnClickListener, OnTaskListListene
 
     override fun onRemoveListItem(position: Int): ArrayList<TaskEntity> {
         DLog(TAG, "onRemoveListItem", "position:$position")
-        mAllTaskArrayList.remove(mSelectedTaskArrayList[position])
-        mSelectedTaskArrayList.removeAt(position)
+        if (position == -1) {
+            mAllTaskArrayList.removeAll(mAllTaskArrayList)
+            mSelectedTaskArrayList.removeAll(mSelectedTaskArrayList)
+        } else {
+            mAllTaskArrayList.remove(mSelectedTaskArrayList[position])
+            mSelectedTaskArrayList.removeAt(position)
+        }
         return  mSelectedTaskArrayList
     }
 
-    override fun onEditListItem(position: Int): ArrayList<TaskEntity> {
+    override fun onEditListItem(position: Int) {
         val startTime = Util.toString(
             mSelectedTaskArrayList[position].startTime,
             FORMAT_PATTERN_DATE_ALL
@@ -119,37 +129,21 @@ class MainActivity: AppCompatActivity(), View.OnClickListener, OnTaskListListene
             title
         )
         dialog.show(supportFragmentManager, "create")
-        return mSelectedTaskArrayList
     }
 
     override fun onChangeListItem(year: Int, month: Int, dayOfWeek: Int) {
         DLog(TAG, "onChangeListItem", "year:$year, month:$month, dayOfWeek:$dayOfWeek")
-        val monthStr = Util.paddingLeftToString(month.toString(), 2)
-        val dayOfWeekStr = Util.paddingLeftToString(dayOfWeek.toString(), 2)
+        val dayTimeMaxLength = resources.getInteger(R.integer.day_and_time_max_length)
+        val monthStr = Util.paddingLeftToString(month.toString(), dayTimeMaxLength)
+        val dayOfWeekStr = Util.paddingLeftToString(dayOfWeek.toString(), dayTimeMaxLength)
         val selectDay = "$year/$monthStr/$dayOfWeekStr"
 
         val selectDayAndWeek = "$selectDay(${Util.getWeekAsString(year, month, dayOfWeek)})"
         today_text.text = selectDayAndWeek
 
-        mSelectedTaskArrayList.removeAll(mAllTaskArrayList)
         val selectTimeLocalDateTime = LocalDateTime.of(year, month, dayOfWeek, 0, 0)
-        val selectTimeLocalDateTimeDays = selectTimeLocalDateTime.truncatedTo(ChronoUnit.DAYS)
-        for (i in 0 until mAllTaskArrayList.size) {
-            DLog(TAG, "sample", "-------------------in")
-            DLog(TAG, "sample, select", "$selectTimeLocalDateTimeDays")
-            DLog(TAG, "sample, start", "${mAllTaskArrayList[i].startTime}")
-            DLog(TAG, "sample, end", "${mAllTaskArrayList[i].endTime}")
-            if (selectTimeLocalDateTimeDays.isEqual(mAllTaskArrayList[i].startTime)
-                || selectTimeLocalDateTimeDays.isBefore(mAllTaskArrayList[i].startTime)) {
-                DLog(TAG, "sample", "1in")
-                mSelectedTaskArrayList.add(mAllTaskArrayList[i])
-            }
-            if (selectTimeLocalDateTimeDays.isEqual(mAllTaskArrayList[i].endTime)
-                || selectTimeLocalDateTimeDays.isAfter(mAllTaskArrayList[i].endTime)) {
-                DLog(TAG, "sample", "2in")
-            }
-            DLog(TAG, "sample", "-------------------end")
-        }
+        mSelectedTaskArrayList.removeAll(mAllTaskArrayList)
+        extractTasks(selectTimeLocalDateTime)
 
         // update list
         updateList()
@@ -165,33 +159,32 @@ class MainActivity: AppCompatActivity(), View.OnClickListener, OnTaskListListene
                 dialog.show(supportFragmentManager, "create")
             }
             R.id.calendar_day_button -> {
+                task_add_button.visibility = View.VISIBLE
                 val currentTimeLocalDateTime = Util.getCurrentLocalDateTime()
-                val currentTimeString = Util.toString(
-                    currentTimeLocalDateTime,
-                    FORMAT_PATTERN_DATE_WEEK
-                )
-                today_text.text = currentTimeString
+                today_text.text = Util.toString(currentTimeLocalDateTime, FORMAT_PATTERN_DATE_WEEK)
 
-                mSelectedTaskArrayList = arrayListOf()
-                for (i in 0 until mAllTaskArrayList.size) {
-                    if (Util.toString(
-                            mAllTaskArrayList[i].startTime,
-                            FORMAT_PATTERN_DATE_WEEK
-                        ) == currentTimeString
-                    ) {
-                        mSelectedTaskArrayList.add(mAllTaskArrayList[i])
-                    }
-                }
+                mSelectedTaskArrayList.removeAll(mAllTaskArrayList)
+                extractTasks(currentTimeLocalDateTime)
+
                 mFragmentOnActivity = TaskListFragment().newInstance(mSelectedTaskArrayList)
                 replaceFragment(mFragmentOnActivity)
-
             }
             R.id.calendar_week_button -> {
+                task_add_button.visibility = View.VISIBLE
+                val currentTimeLocalDateTime = Util.getCurrentLocalDateTime()
+                today_text.text = Util.toString(currentTimeLocalDateTime, FORMAT_PATTERN_DATE_WEEK)
+
+                mSelectedTaskArrayList.removeAll(mAllTaskArrayList)
+                extractTasks(currentTimeLocalDateTime)
+
                 mFragmentOnActivity = TaskCalendarFragment().newInstance(mSelectedTaskArrayList)
                 replaceFragment(mFragmentOnActivity)
             }
             R.id.setting_button -> {
-
+                task_add_button.visibility = View.INVISIBLE
+                today_text.text = "Settings"
+                mFragmentOnActivity = SettingsFragment().newInstance()
+                replaceFragment(mFragmentOnActivity)
             }
             else -> {
 
@@ -206,6 +199,21 @@ class MainActivity: AppCompatActivity(), View.OnClickListener, OnTaskListListene
         fragmentTransaction.commit()
     }
 
+    private fun extractTasks(selectDate: LocalDateTime) {
+        val truncateSelectedDateToDays = selectDate.truncatedTo(ChronoUnit.DAYS)
+        for (i in 0 until mAllTaskArrayList.size) {
+            val startTime = mAllTaskArrayList[i].startTime
+            val endTime = mAllTaskArrayList[i].endTime
+            if ((truncateSelectedDateToDays.isEqual(startTime.truncatedTo(ChronoUnit.DAYS))
+                        || truncateSelectedDateToDays.isAfter(startTime))
+                && (truncateSelectedDateToDays.isEqual(endTime.truncatedTo((ChronoUnit.DAYS)))
+                        || truncateSelectedDateToDays.isBefore(endTime))) {
+                mSelectedTaskArrayList.add(mAllTaskArrayList[i])
+                sortList(mSelectedTaskArrayList)
+            }
+        }
+    }
+
     private fun updateList() {
         if (mFragmentOnActivity is TaskListFragment) {
             val fragment = mFragmentOnActivity as TaskListFragment
@@ -218,6 +226,5 @@ class MainActivity: AppCompatActivity(), View.OnClickListener, OnTaskListListene
 
     private fun sortList(array: ArrayList<TaskEntity>) {
         Collections.sort(array, TaskListComparator())
-
     }
 }

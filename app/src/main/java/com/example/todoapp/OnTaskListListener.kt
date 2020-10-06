@@ -1,12 +1,11 @@
 package com.example.todoapp
 
-import TaskEntity
+import com.example.todoapp.entitys.TaskEntity
 import java.time.LocalDateTime
 
 interface OnTaskListListener {
-    fun getListItem(): ArrayList<TaskEntity>
     fun onCreateListItem(startDate: LocalDateTime, endDate: LocalDateTime, title: String)
     fun onRemoveListItem(position: Int): ArrayList<TaskEntity>
-    fun onEditListItem(position: Int): ArrayList<TaskEntity>
+    fun onEditListItem(position: Int)
     fun onChangeListItem(year: Int, month: Int, dayOfWeek: Int)
 }

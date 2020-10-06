@@ -1,6 +1,5 @@
-package com.example.todoapp
+package com.example.todoapp.controler
 
-import TaskEntity
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -9,6 +8,11 @@ import android.widget.CalendarView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
+import com.example.todoapp.OnTaskListListener
+import com.example.todoapp.R
+import com.example.todoapp.entitys.TaskEntity
+import com.example.todoapp.utils.DLog
+import com.example.todoapp.utils.Util
 import java.time.LocalDateTime
 
 class TaskCalendarFragment: Fragment(), CalendarView.OnDateChangeListener {
@@ -51,7 +55,7 @@ class TaskCalendarFragment: Fragment(), CalendarView.OnDateChangeListener {
     override fun onSelectedDayChange(view: CalendarView, year: Int, month: Int, dayOfMonth: Int) {
         DLog(TAG, "onSelectedDayChange", "year:$year, month:${month + 1}, dayOfMonth:$dayOfMonth")
         mTaskListListener.onChangeListItem(year, month + 1, dayOfMonth)
-        mFragment.setSelectTime(LocalDateTime.of(year, month, dayOfMonth, 0, 0))
+        mFragment.setSelectTime(LocalDateTime.of(year, month + 1, dayOfMonth, 0, 0))
     }
 
     private fun replaceFragment(fragment: Fragment) {

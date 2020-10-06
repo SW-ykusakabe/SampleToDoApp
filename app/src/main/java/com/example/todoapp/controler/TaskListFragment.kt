@@ -1,6 +1,5 @@
-package com.example.todoapp
+package com.example.todoapp.controler
 
-import TaskEntity
 import android.app.AlertDialog
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -9,6 +8,11 @@ import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ListView
 import androidx.fragment.app.Fragment
+import com.example.todoapp.OnTaskListListener
+import com.example.todoapp.R
+import com.example.todoapp.entitys.TaskEntity
+import com.example.todoapp.models.TaskListAdapter
+import com.example.todoapp.utils.Util
 import java.time.LocalDateTime
 
 
@@ -70,7 +74,7 @@ class TaskListFragment: Fragment(), AdapterView.OnItemClickListener, AdapterView
                 when (which) {
                     0 -> {
                         val array = mTaskListListener.onRemoveListItem(position)
-                        mTaskListAdapter.updateAnimalList(array)
+                        mTaskListAdapter.updateList(array)
                     }
                     1 -> {
                         mTaskListListener.onEditListItem(position)
@@ -84,7 +88,7 @@ class TaskListFragment: Fragment(), AdapterView.OnItemClickListener, AdapterView
     }
 
     fun updateAdapter(array: ArrayList<TaskEntity>) {
-        mTaskListAdapter.updateAnimalList(array)
+        mTaskListAdapter.updateList(array)
     }
 
     fun setSelectTime(selectTime: LocalDateTime) {

@@ -1,6 +1,6 @@
-package com.example.todoapp
+package com.example.todoapp.controler
 
-import TaskEntity
+import com.example.todoapp.entitys.TaskEntity
 
 class TaskListComparator: Comparator<TaskEntity> {
     override fun compare(sortDataFirst: TaskEntity, sortDataSecond: TaskEntity): Int {

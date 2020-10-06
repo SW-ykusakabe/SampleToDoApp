@@ -1,4 +1,4 @@
-package com.example.todoapp
+package com.example.todoapp.utils
 
 import java.time.Instant
 import java.time.LocalDateTime
@@ -54,7 +54,7 @@ object Util {
     fun toString(date: Date, formatStr: String): String {
         val instant: Instant = date.toInstant()
         val localDateTime = LocalDateTime.ofInstant(instant, ZoneId.systemDefault())
-        return this.toString(localDateTime, formatStr)
+        return toString(localDateTime, formatStr)
     }
 
     fun getWeekAsInt(year: Int, month: Int, day: Int): Int {
