@@ -1,23 +1,30 @@
-package com.example.todoapp.controler
+package com.example.todoapp.controller
 
 import android.app.AlertDialog
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import androidx.fragment.app.Fragment
-import com.example.todoapp.OnTaskListListener
+import com.example.todoapp.models.OnTaskListListener
 import com.example.todoapp.R
-import com.example.todoapp.utils.DLog
-import com.example.todoapp.utils.Util
+import com.example.todoapp.Util
 
+/**
+ * SettingsFragment - Fragment for setting
+ */
 class SettingsFragment: Fragment(), View.OnClickListener {
     companion object {
         private val TAG: String = Util.getClassName(object : Any() {}.javaClass.enclosingClass.name)
     }
     private lateinit var mTaskListListener: OnTaskListListener
 
+    /**
+     * newInstance - return to this instance
+     * @return This instance
+     */
     fun newInstance(): SettingsFragment {
         val args = Bundle()
         val fragment = SettingsFragment()
@@ -26,6 +33,7 @@ class SettingsFragment: Fragment(), View.OnClickListener {
         return fragment
     }
 
+    /** @inheritDoc */
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -45,10 +53,11 @@ class SettingsFragment: Fragment(), View.OnClickListener {
         return view
     }
 
+    /** @inheritDoc */
     override fun onClick(v: View) {
         when(v.id) {
             R.id.button -> {
-                DLog(TAG, "onClick", "button")
+                Log.d(TAG, "onClick : button")
                 AlertDialog.Builder(activity)
                     .setTitle("Delete all list")
                     .setMessage("Do you really want to delete task list?")

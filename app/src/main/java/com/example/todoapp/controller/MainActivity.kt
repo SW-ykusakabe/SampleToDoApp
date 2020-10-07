@@ -1,6 +1,7 @@
-package com.example.todoapp.controler
+package com.example.todoapp.controller
 
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -8,17 +9,18 @@ import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
 import com.example.todoapp.*
 import com.example.todoapp.entitys.TaskEntity
-import com.example.todoapp.entitys.Tasks
-import com.example.todoapp.models.AppDatabase
-import com.example.todoapp.utils.DLog
-import com.example.todoapp.utils.Util
+import com.example.todoapp.entitys.TaskDBEntity
+import com.example.todoapp.Util
+import com.example.todoapp.models.*
 import kotlinx.android.synthetic.main.activity_main.*
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
 import java.util.*
 import kotlin.collections.ArrayList
 
-
+/**
+ * MainActivity - Activity for main
+ */
 class MainActivity: AppCompatActivity(), View.OnClickListener, OnTaskListListener {
     companion object {
         private val TAG: String = Util.getClassName(object : Any() {}.javaClass.enclosingClass.name)
@@ -27,10 +29,12 @@ class MainActivity: AppCompatActivity(), View.OnClickListener, OnTaskListListene
     private lateinit var mAllTaskArrayList: ArrayList<TaskEntity>
     private lateinit var mSelectedTaskArrayList: ArrayList<TaskEntity>
     private lateinit var mFragmentOnActivity: Fragment
+    private lateinit var  mTaskDao: TaskDao
 
     private val FORMAT_PATTERN_DATE_ALL: String = "yyyy/MM/dd(e)-HH:mm"
     private val FORMAT_PATTERN_DATE_WEEK: String = "yyyy/MM/dd(E)"
 
+    /** @inheritDoc */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -39,24 +43,32 @@ class MainActivity: AppCompatActivity(), View.OnClickListener, OnTaskListListene
         today_text.text = Util.toString(currentTimeLocalDateTime, FORMAT_PATTERN_DATE_WEEK)
 
         // get data
-        val data = AppDatabase.getInstance(this)
-        val taskDao = data.taskDao()
-        taskDao.deleteAll()
-        taskDao.insert(Tasks(0, "2020/10/05(2)-12:00", "2020/10/06(3)-19:00", "Sample Title"))
-        taskDao.insert(Tasks(0, "2020/10/06(3)-12:00", "2020/10/06(3)-19:00", "Sample Title"))
-        taskDao.insert(Tasks(0, "2020/10/06(3)-13:00", "2020/10/07(4)-19:00", "Sample Title"))
-        taskDao.insert(Tasks(0, "2020/10/07(4)-13:00", "2020/10/07(4)-19:00", "Sample Title"))
-        val array = taskDao.getAll()
+        val appDatabase = AppDatabase.newInstance(this)
+        mTaskDao = appDatabase.taskDao()
+        if (mTaskDao.getAll().isEmpty()) {
+            Log.d(TAG, "onCreate : getData is empty")
+            mTaskDao.insert(TaskDBEntity(0, "2020/10/05(2)-12:00", "2020/10/06(3)-19:00", "Sample Title"))
+            mTaskDao.insert(TaskDBEntity(0, "2020/10/06(3)-12:00", "2020/10/06(3)-19:00", "Sample Title"))
+            mTaskDao.insert(TaskDBEntity(0, "2020/10/06(3)-13:00", "2020/10/07(4)-19:00", "Sample Title"))
+            mTaskDao.insert(TaskDBEntity(0, "2020/10/07(4)-13:00", "2020/10/07(4)-19:00", "Sample Title"))
+        }
+        val array = mTaskDao.getAll()
+
 
         mAllTaskArrayList = arrayListOf()
         for (i in array.indices) {
             mAllTaskArrayList.add(
                 TaskEntity(
-                    Util.toLocalDateTime(array[i].startTime, FORMAT_PATTERN_DATE_ALL)
-                    , Util.toLocalDateTime(array[i].endTime, FORMAT_PATTERN_DATE_ALL)
-                    ,array[i].title)
+                    Util.toLocalDateTime(array[i].startTime, FORMAT_PATTERN_DATE_ALL),
+                    Util.toLocalDateTime(array[i].endTime, FORMAT_PATTERN_DATE_ALL),
+                    array[i].title)
             )
         }
+
+        sortList(mAllTaskArrayList)
+
+        mSelectedTaskArrayList = arrayListOf()
+        extractTasks(currentTimeLocalDateTime)
 
         // set listener
         task_add_button.setOnClickListener(this)
@@ -64,18 +76,19 @@ class MainActivity: AppCompatActivity(), View.OnClickListener, OnTaskListListene
         calendar_week_button.setOnClickListener(this)
         setting_button.setOnClickListener(this)
 
-        sortList(mAllTaskArrayList)
-
-        mSelectedTaskArrayList = arrayListOf()
-        extractTasks(currentTimeLocalDateTime)
-
         // fragment
         mFragmentOnActivity = TaskListFragment().newInstance(mSelectedTaskArrayList)
         replaceFragment(mFragmentOnActivity)
     }
 
+    /** @inheritDoc */
     override fun onCreateListItem(startDate: LocalDateTime, endDate: LocalDateTime, title: String) {
-        DLog(TAG, "onCreateListItem", "startDate:$startDate, endDate:$endDate, title:$title")
+        Log.d(TAG, "onCreateListItem : startDate:$startDate, endDate:$endDate, title:$title")
+        mTaskDao.insert(TaskDBEntity(
+            0,
+            Util.toString(startDate, FORMAT_PATTERN_DATE_ALL),
+            Util.toString(endDate, FORMAT_PATTERN_DATE_ALL),
+            title))
         mAllTaskArrayList.add(TaskEntity(startDate, endDate, title))
         sortList(mAllTaskArrayList)
 
@@ -93,18 +106,26 @@ class MainActivity: AppCompatActivity(), View.OnClickListener, OnTaskListListene
         updateList()
     }
 
+    /** @inheritDoc */
     override fun onRemoveListItem(position: Int): ArrayList<TaskEntity> {
-        DLog(TAG, "onRemoveListItem", "position:$position")
+        Log.d(TAG, "onRemoveListItem : position:$position")
         if (position == -1) {
+            mTaskDao.deleteAll()
             mAllTaskArrayList.removeAll(mAllTaskArrayList)
             mSelectedTaskArrayList.removeAll(mSelectedTaskArrayList)
         } else {
+            val array = mTaskDao.getTasksAll(
+                Util.toString(mSelectedTaskArrayList[position].startTime, FORMAT_PATTERN_DATE_ALL),
+                Util.toString(mSelectedTaskArrayList[position].endTime, FORMAT_PATTERN_DATE_ALL),
+                mSelectedTaskArrayList[position].title)
+            mTaskDao.delete(array[0].id)
             mAllTaskArrayList.remove(mSelectedTaskArrayList[position])
             mSelectedTaskArrayList.removeAt(position)
         }
         return  mSelectedTaskArrayList
     }
 
+    /** @inheritDoc */
     override fun onEditListItem(position: Int) {
         val startTime = Util.toString(
             mSelectedTaskArrayList[position].startTime,
@@ -115,33 +136,26 @@ class MainActivity: AppCompatActivity(), View.OnClickListener, OnTaskListListene
             FORMAT_PATTERN_DATE_ALL
         )
         val title = mSelectedTaskArrayList[position].title
-        DLog(
+        Log.d(
             TAG,
-            "onEditListItem",
-            "position:$position, startTime:${startTime}, endTime:${endTime}, title:$title"
+            "onEditListItem : position:$position, startTime:${startTime}, endTime:${endTime}, title:$title"
         )
 
         val dialog = TaskCreateDialogFragment().newInstance(
             true,
             position,
-            startTime,
-            endTime,
-            title
+            mSelectedTaskArrayList[position]
         )
         dialog.show(supportFragmentManager, "create")
     }
 
+    /** @inheritDoc */
     override fun onChangeListItem(year: Int, month: Int, dayOfWeek: Int) {
-        DLog(TAG, "onChangeListItem", "year:$year, month:$month, dayOfWeek:$dayOfWeek")
-        val dayTimeMaxLength = resources.getInteger(R.integer.day_and_time_max_length)
-        val monthStr = Util.paddingLeftToString(month.toString(), dayTimeMaxLength)
-        val dayOfWeekStr = Util.paddingLeftToString(dayOfWeek.toString(), dayTimeMaxLength)
-        val selectDay = "$year/$monthStr/$dayOfWeekStr"
-
-        val selectDayAndWeek = "$selectDay(${Util.getWeekAsString(year, month, dayOfWeek)})"
-        today_text.text = selectDayAndWeek
+        Log.d(TAG, "onChangeListItem : year:$year, month:$month, dayOfWeek:$dayOfWeek")
 
         val selectTimeLocalDateTime = LocalDateTime.of(year, month, dayOfWeek, 0, 0)
+        today_text.text = Util.toString(selectTimeLocalDateTime, FORMAT_PATTERN_DATE_WEEK)
+
         mSelectedTaskArrayList.removeAll(mAllTaskArrayList)
         extractTasks(selectTimeLocalDateTime)
 
@@ -149,12 +163,12 @@ class MainActivity: AppCompatActivity(), View.OnClickListener, OnTaskListListene
         updateList()
     }
 
+    @Override
     override fun onClick(v: View) {
         when (v.id) {
             R.id.task_add_button -> {
                 val args = Bundle()
                 val dialog = TaskCreateDialogFragment()
-                args.putBoolean("EDIT", false)
                 dialog.arguments = args
                 dialog.show(supportFragmentManager, "create")
             }
@@ -192,6 +206,10 @@ class MainActivity: AppCompatActivity(), View.OnClickListener, OnTaskListListene
         }
     }
 
+    /**
+     * replaceFragment - Replace the inside of the container with an argument fragment
+     * @param fragment Fragment to display
+     */
     private fun replaceFragment(fragment: Fragment) {
         val fragmentManager: FragmentManager = supportFragmentManager
         val fragmentTransaction: FragmentTransaction = fragmentManager.beginTransaction()
@@ -199,6 +217,10 @@ class MainActivity: AppCompatActivity(), View.OnClickListener, OnTaskListListene
         fragmentTransaction.commit()
     }
 
+    /**
+     * extractTasks - Display the task with the date of the argument
+     * @param selectDate　Date to display
+     */
     private fun extractTasks(selectDate: LocalDateTime) {
         val truncateSelectedDateToDays = selectDate.truncatedTo(ChronoUnit.DAYS)
         for (i in 0 until mAllTaskArrayList.size) {
@@ -214,6 +236,9 @@ class MainActivity: AppCompatActivity(), View.OnClickListener, OnTaskListListene
         }
     }
 
+    /**
+     * updateList - Update the displayed list
+     */
     private fun updateList() {
         if (mFragmentOnActivity is TaskListFragment) {
             val fragment = mFragmentOnActivity as TaskListFragment
@@ -224,6 +249,10 @@ class MainActivity: AppCompatActivity(), View.OnClickListener, OnTaskListListene
         }
     }
 
+    /**
+     * sortList - Sort the list of arguments
+     * @param array ArrayList of TaskEntity class you want to sort
+     */
     private fun sortList(array: ArrayList<TaskEntity>) {
         Collections.sort(array, TaskListComparator())
     }

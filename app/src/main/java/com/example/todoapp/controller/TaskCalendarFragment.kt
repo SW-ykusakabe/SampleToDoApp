@@ -1,6 +1,7 @@
-package com.example.todoapp.controler
+package com.example.todoapp.controller
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -8,13 +9,15 @@ import android.widget.CalendarView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
-import com.example.todoapp.OnTaskListListener
+import com.example.todoapp.models.OnTaskListListener
 import com.example.todoapp.R
+import com.example.todoapp.Util
 import com.example.todoapp.entitys.TaskEntity
-import com.example.todoapp.utils.DLog
-import com.example.todoapp.utils.Util
 import java.time.LocalDateTime
 
+/**
+ * TaskCalendarFragment -  Fragment for task calendar
+ */
 class TaskCalendarFragment: Fragment(), CalendarView.OnDateChangeListener {
     companion object {
         private val TAG: String = Util.getClassName(object : Any() {}.javaClass.enclosingClass.name)
@@ -24,6 +27,11 @@ class TaskCalendarFragment: Fragment(), CalendarView.OnDateChangeListener {
     private lateinit var mTaskListListener: OnTaskListListener
     private lateinit var mFragment: TaskListFragment
 
+    /**
+     * newInstance - return to this instance
+     * @param array　ArrayList of tasks to display
+     * @return This instance
+     */
     fun newInstance(array: ArrayList<TaskEntity>): TaskCalendarFragment {
         val args = Bundle()
         val fragment = TaskCalendarFragment()
@@ -32,6 +40,7 @@ class TaskCalendarFragment: Fragment(), CalendarView.OnDateChangeListener {
         return fragment
     }
 
+    /** @inheritDoc */
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -52,12 +61,17 @@ class TaskCalendarFragment: Fragment(), CalendarView.OnDateChangeListener {
         return view
     }
 
+    /** @inheritDoc */
     override fun onSelectedDayChange(view: CalendarView, year: Int, month: Int, dayOfMonth: Int) {
-        DLog(TAG, "onSelectedDayChange", "year:$year, month:${month + 1}, dayOfMonth:$dayOfMonth")
+        Log.d(TAG, "onSelectedDayChange : year:$year, month:${month + 1}, dayOfMonth:$dayOfMonth")
         mTaskListListener.onChangeListItem(year, month + 1, dayOfMonth)
         mFragment.setSelectTime(LocalDateTime.of(year, month + 1, dayOfMonth, 0, 0))
     }
 
+    /**
+     * replaceFragment - Replace the inside of the container with an argument fragment
+     * @param fragment Fragment to display
+     */
     private fun replaceFragment(fragment: Fragment) {
         val fragmentManager: FragmentManager = childFragmentManager
         val fragmentTransaction: FragmentTransaction = fragmentManager.beginTransaction()
@@ -65,6 +79,10 @@ class TaskCalendarFragment: Fragment(), CalendarView.OnDateChangeListener {
         fragmentTransaction.commit()
     }
 
+    /**
+     * updateAdapter - Update adapter with arrayList of arguments
+     * @param array ArrayList to update
+     */
     fun updateAdapter(array: ArrayList<TaskEntity>) {
         mFragment.updateAdapter(array)
     }

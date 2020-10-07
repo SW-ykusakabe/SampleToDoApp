@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".controler.MainActivity">
+    tools:context=".controller.MainActivity">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
@@ -14,30 +14,40 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:background="@color/colorPrimary"
+        android:background="#3CA371"
         android:theme="?attr/actionBarTheme" />
 
-    <TextView
-        android:id="@+id/today_text"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="@+id/toolbar"
         app:layout_constraintEnd_toStartOf="@+id/toolbar"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:paddingHorizontal="@dimen/small_padding"
-        android:text="@string/dummy_hint"
-        android:textColor="@color/colorWhite"
-        android:textSize="@dimen/font_size"/>
+        app:layout_constraintTop_toTopOf="parent">
 
-    <Button
-        android:id="@+id/task_add_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="@+id/toolbar"
-        app:layout_constraintEnd_toEndOf="@+id/toolbar"
-        app:layout_constraintTop_toTopOf="@+id/toolbar"
-        android:text="@string/pulse"/>
+        <TextView
+            android:id="@+id/today_text"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:paddingHorizontal="@dimen/small_padding"
+            android:layout_gravity="center"
+            android:text="@string/dummy_hint"
+            android:textColor="@color/colorWhite"
+            android:textSize="@dimen/font_size"/>
+
+        <ImageButton
+            android:id="@+id/task_add_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:adjustViewBounds="true"
+            android:background="@drawable/button_add_task_selector"
+            android:scaleType="fitCenter"
+            android:text="@string/pulse"
+            android:contentDescription="@string/pulse" />
+
+    </LinearLayout>
 
     <FrameLayout
         android:id="@+id/container"
@@ -58,7 +68,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        android:background="@color/colorPrimary">
+        android:background="#3CA371">
 
         <Button
             android:id="@+id/calendar_day_button"

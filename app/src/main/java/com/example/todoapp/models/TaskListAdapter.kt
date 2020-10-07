@@ -8,10 +8,13 @@ import android.widget.ArrayAdapter
 import android.widget.TextView
 import com.example.todoapp.R
 import com.example.todoapp.entitys.TaskEntity
-import com.example.todoapp.utils.Util
+import com.example.todoapp.Util
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
 
+/**
+ * TaskListAdapter - Adapter for task list
+ */
 class TaskListAdapter(context: Context, private var mTaskList: ArrayList<TaskEntity>): ArrayAdapter<TaskEntity>(context, 0, mTaskList) {
     companion object {
         private val TAG: String = Util.getClassName(object : Any() {}.javaClass.enclosingClass.name)
@@ -20,6 +23,7 @@ class TaskListAdapter(context: Context, private var mTaskList: ArrayList<TaskEnt
     private lateinit var mSelectTime: LocalDateTime
     private val layoutInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
 
+    /** @inheritDoc  */
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
         val task = mTaskList[position]
 
@@ -54,12 +58,20 @@ class TaskListAdapter(context: Context, private var mTaskList: ArrayList<TaskEnt
         return view!!
     }
 
+    /**
+     * updateList - Update the displayed list
+     * @param taskList ArrayList you want to update
+     */
     fun updateList(taskList: ArrayList<TaskEntity>) {
         mTaskList = taskList
         // 再描画
         notifyDataSetChanged()
     }
 
+    /**
+     * setSelectTime -　Set the date of the argument to the adapter
+     * @param selectTime Selected date
+     */
     fun setSelectTime(selectTime: LocalDateTime) {
         mSelectTime = selectTime
     }
