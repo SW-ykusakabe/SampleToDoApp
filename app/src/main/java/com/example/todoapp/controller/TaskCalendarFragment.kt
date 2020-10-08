@@ -21,8 +21,8 @@ import java.time.LocalDateTime
 class TaskCalendarFragment: Fragment(), CalendarView.OnDateChangeListener {
     companion object {
         private val TAG: String = Util.getClassName(object : Any() {}.javaClass.enclosingClass.name)
+        private const val KYE_ARGS_TASK_LIST: String = "ARGS_TASK_LIST"
     }
-    private val KYE_ARGS_TASK_LIST: String = "ARGS_TASK_LIST"
 
     private lateinit var mTaskListListener: OnTaskListListener
     private lateinit var mFragment: TaskListFragment

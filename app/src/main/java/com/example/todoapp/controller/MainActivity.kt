@@ -24,15 +24,15 @@ import kotlin.collections.ArrayList
 class MainActivity: AppCompatActivity(), View.OnClickListener, OnTaskListListener {
     companion object {
         private val TAG: String = Util.getClassName(object : Any() {}.javaClass.enclosingClass.name)
+
+        private const val FORMAT_PATTERN_DATE_ALL: String = "yyyy/MM/dd(e)-HH:mm"
+        private const val FORMAT_PATTERN_DATE_WEEK: String = "yyyy/MM/dd(E)"
     }
 
     private lateinit var mAllTaskArrayList: ArrayList<TaskEntity>
     private lateinit var mSelectedTaskArrayList: ArrayList<TaskEntity>
     private lateinit var mFragmentOnActivity: Fragment
     private lateinit var  mTaskDao: TaskDao
-
-    private val FORMAT_PATTERN_DATE_ALL: String = "yyyy/MM/dd(e)-HH:mm"
-    private val FORMAT_PATTERN_DATE_WEEK: String = "yyyy/MM/dd(E)"
 
     /** @inheritDoc */
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -196,7 +196,7 @@ class MainActivity: AppCompatActivity(), View.OnClickListener, OnTaskListListene
             }
             R.id.setting_button -> {
                 task_add_button.visibility = View.INVISIBLE
-                today_text.text = "Settings"
+                today_text.text = this.resources.getString(R.string.settings_title)
                 mFragmentOnActivity = SettingsFragment().newInstance()
                 replaceFragment(mFragmentOnActivity)
             }

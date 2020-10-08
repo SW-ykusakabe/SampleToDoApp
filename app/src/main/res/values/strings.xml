@@ -18,4 +18,6 @@
     <string name="time_hint">time</string>
     <string name="title_hint">title</string>
 
+    <string name="settings_title">Settings</string>
+
 </resources>

@@ -17,22 +17,24 @@
             android:id="@+id/start_time_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:visibility="gone"
             android:textSize="12sp"
             android:hint=""/>
 
-        <TextView
-            android:layout_width="wrap_content"
+        <ImageView
+            android:layout_width="12dp"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:textSize="12sp"
-            android:text="@string/arrow_under"
-            android:hint="@string/arrow_under"
-            tools:ignore="NestedWeights" />
+            android:src="@drawable/ic_arrow"
+            android:scaleType="fitXY"
+            tools:ignore="NestedWeights"
+            android:contentDescription="@string/arrow_under" />
 
         <TextView
             android:id="@+id/end_time_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:visibility="gone"
             android:textSize="12sp"/>
 
     </LinearLayout>

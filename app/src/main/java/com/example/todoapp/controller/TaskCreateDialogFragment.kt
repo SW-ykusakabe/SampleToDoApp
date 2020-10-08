@@ -19,19 +19,18 @@ import java.util.*
  */
 class TaskCreateDialogFragment: DialogFragment() {
     companion object {
-        private val TAG: String = Util.getClassName(object :
-            Any() {}.javaClass.enclosingClass.name)
+        private val TAG: String = Util.getClassName(object : Any() {}.javaClass.enclosingClass.name)
+
+        private const val FORMAT_PATTERN_YEAR: String = "yyyy"
+        private const val FORMAT_PATTERN_MONTH: String = "MM"
+        private const val FORMAT_PATTERN_DAY: String = "dd"
+        private const val FORMAT_PATTERN_HOUR: String = "HH"
+        private const val FORMAT_PATTERN_MINUTE: String = "mm"
+
+        private const val KEY_ARGS_EDIT: String = "ARGS_EDIT"
+        private const val KEY_ARGS_EDIT_POSITION: String = "ARGS_EDIT_POSITION"
+        private const val KEY_ARGS_TASK_ENTITY: String = "KEY_ARGS_TASK_ENTITY"
     }
-
-    private val FORMAT_PATTERN_YRAR: String = "yyyy"
-    private val FORMAT_PATTERN_MONTH: String = "MM"
-    private val FORMAT_PATTERN_DAY: String = "dd"
-    private val FORMAT_PATTERN_HOUR: String = "HH"
-    private val FORMAT_PATTERN_MINUTE: String = "mm"
-
-    private val KEY_ARGS_EDIT: String = "ARGS_EDIT"
-    private val KEY_ARGS_EDIT_POSITION: String = "ARGS_EDIT_POSITION"
-    private val KEY_ARGS_TASK_ENTITY: String = "KEY_ARGS_TASK_ENTITY"
 
     private lateinit var mTaskListListener: OnTaskListListener
 
@@ -90,11 +89,11 @@ class TaskCreateDialogFragment: DialogFragment() {
             }
             val startTime = taskEntity.startTime
             val endTime = taskEntity.endTime
-            startYearEditText.setText(Util.toString(startTime, FORMAT_PATTERN_YRAR))
+            startYearEditText.setText(Util.toString(startTime, FORMAT_PATTERN_YEAR))
             startMonthEditText.setText(Util.toString(startTime, FORMAT_PATTERN_MONTH))
             startDayEditText.setText(Util.toString(startTime, FORMAT_PATTERN_DAY))
 
-            endYearEditText.setText(Util.toString(endTime, FORMAT_PATTERN_YRAR))
+            endYearEditText.setText(Util.toString(endTime, FORMAT_PATTERN_YEAR))
             endMonthEditText.setText(Util.toString(endTime, FORMAT_PATTERN_MONTH))
             endDayEditText.setText(Util.toString(endTime, FORMAT_PATTERN_DAY))
 
@@ -126,18 +125,19 @@ class TaskCreateDialogFragment: DialogFragment() {
                 if (startMinuit.isEmpty()) {
                     startMinuit = Util.toString(currentTime, FORMAT_PATTERN_MINUTE)
                 }
-                try {
-
+                val startLocalDateTime = try {
+                    LocalDateTime.of(
+                        startYear.toInt(),
+                        startMonth.toInt(),
+                        startDay.toInt(),
+                        startHour.toInt(),
+                        startMinuit.toInt()
+                    )
                 } catch (e: DateTimeException) {
-
+                    Log.e(TAG, "e:${e}")
+                    simpleDialog("start time set error", "$e", "close")
+                    return@setPositiveButton
                 }
-                val startLocalDateTime = LocalDateTime.of(
-                    startYear.toInt(),
-                    startMonth.toInt(),
-                    startDay.toInt(),
-                    startHour.toInt(),
-                    startMinuit.toInt()
-                )
                 val startCalendar = Calendar.getInstance()
                 startCalendar.set(
                     startYear.toInt(),
@@ -161,15 +161,22 @@ class TaskCreateDialogFragment: DialogFragment() {
                     startCalendar.add(Calendar.HOUR_OF_DAY, 1)
                     val startTime = startCalendar.time
 
-                    Util.toLocalDateTime(startTime)
+                    Util.toLocalDateTime(date = startTime)
                 } else {
-                    LocalDateTime.of(
-                        endYear.toInt(),
-                        endMonth.toInt(),
-                        endDay.toInt(),
-                        endHour.toInt(),
-                        endMinuit.toInt()
-                    )
+                    try {
+                        LocalDateTime.of(
+                            endYear.toInt(),
+                            endMonth.toInt(),
+                            endDay.toInt(),
+                            endHour.toInt(),
+                            endMinuit.toInt()
+                        )
+//                        LocalDateTime.of(year = 2020, month = 10, dayOfMonth = 1, hour = 11, minute = 0)
+                    } catch (e: DateTimeException) {
+                        Log.e(TAG, "e:${e}")
+                        simpleDialog("end time set error", "$e", "close")
+                        return@setPositiveButton
+                    }
                 }
 
                 // title
@@ -188,4 +195,14 @@ class TaskCreateDialogFragment: DialogFragment() {
 
         return builder.create()
     }
+
+    private fun simpleDialog(title: String, message: String, buttonName: String) {
+        AlertDialog.Builder(context)
+            .setTitle(title)
+            .setMessage(message)
+            .setPositiveButton(buttonName) { _, _ ->
+            }
+            .show()
+    }
+
 }

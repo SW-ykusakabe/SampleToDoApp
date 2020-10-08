@@ -18,8 +18,9 @@ import java.time.temporal.ChronoUnit
 class TaskListAdapter(context: Context, private var mTaskList: ArrayList<TaskEntity>): ArrayAdapter<TaskEntity>(context, 0, mTaskList) {
     companion object {
         private val TAG: String = Util.getClassName(object : Any() {}.javaClass.enclosingClass.name)
+
+        private const val FORMAT_PATTERN_TIME: String = "HH : mm"
     }
-    private val FORMAT_PATTERN_TIME: String = "HH : mm"
     private lateinit var mSelectTime: LocalDateTime
     private val layoutInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
 

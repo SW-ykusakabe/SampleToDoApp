@@ -21,8 +21,9 @@ import java.time.LocalDateTime
 class TaskListFragment: Fragment(), AdapterView.OnItemLongClickListener {
     companion object {
         private val TAG: String = Util.getClassName(object : Any() {}.javaClass.enclosingClass.name)
+
+        private const val KYE_ARGS_TASK_LIST: String = "ARGS_TASK_LIST"
     }
-    private val KYE_ARGS_TASK_LIST: String = "ARGS_TASK_LIST"
 
     private lateinit var mTaskListAdapter: TaskListAdapter
     private lateinit var mTaskListListener: OnTaskListListener
