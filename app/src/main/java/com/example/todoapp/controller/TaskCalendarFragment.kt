@@ -21,7 +21,9 @@ import java.time.LocalDateTime
 class TaskCalendarFragment: Fragment(), CalendarView.OnDateChangeListener {
     companion object {
         private val TAG: String = Util.getClassName(object : Any() {}.javaClass.enclosingClass.name)
-        private const val KYE_ARGS_TASK_LIST: String = "ARGS_TASK_LIST"
+        private const val FORMAT_PATTERN_DATE_ALL: String = "yyyy/MM/dd(e)-HH:mm"
+
+        private const val KEY_ARGS_TASK_DATE: String = "ARGS_TASK_DATE"
     }
 
     private lateinit var mTaskListListener: OnTaskListListener
@@ -32,10 +34,10 @@ class TaskCalendarFragment: Fragment(), CalendarView.OnDateChangeListener {
      * @param array　ArrayList of tasks to display
      * @return This instance
      */
-    fun newInstance(array: ArrayList<TaskEntity>): TaskCalendarFragment {
+    fun newInstance(date: String, array: ArrayList<TaskEntity>): TaskCalendarFragment {
         val args = Bundle()
         val fragment = TaskCalendarFragment()
-        args.putParcelableArrayList(KYE_ARGS_TASK_LIST, array)
+        args.putString(KEY_ARGS_TASK_DATE, date)
         fragment.arguments = args
         return fragment
     }
@@ -49,11 +51,14 @@ class TaskCalendarFragment: Fragment(), CalendarView.OnDateChangeListener {
         mTaskListListener = context as OnTaskListListener
         val view = inflater.inflate(R.layout.fragment_task_calendar, container, false)
         val args = arguments
+        var dateString = ""
         var array: ArrayList<TaskEntity> = arrayListOf()
         if (args != null) {
-            array = args.getParcelableArrayList<TaskEntity>(KYE_ARGS_TASK_LIST) as ArrayList<TaskEntity>
+            dateString = args.getString(KEY_ARGS_TASK_DATE, Util.toString(Util.getCurrentLocalDateTime(), FORMAT_PATTERN_DATE_ALL))
+            val data = Util.toLocalDateTime(dateString, FORMAT_PATTERN_DATE_ALL)
+            array = mTaskListListener.getTodayList(data)
         }
-        mFragment = TaskListFragment().newInstance(array)
+        mFragment = TaskListFragment().newInstance(dateString, array)
         replaceFragment(mFragment)
 
         val calendarView = view.findViewById<CalendarView>(R.id.calendar_view)

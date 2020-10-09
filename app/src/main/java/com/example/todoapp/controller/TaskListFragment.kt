@@ -2,6 +2,7 @@ package com.example.todoapp.controller
 
 import android.app.AlertDialog
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -21,8 +22,9 @@ import java.time.LocalDateTime
 class TaskListFragment: Fragment(), AdapterView.OnItemLongClickListener {
     companion object {
         private val TAG: String = Util.getClassName(object : Any() {}.javaClass.enclosingClass.name)
+        private const val FORMAT_PATTERN_DATE_ALL: String = "yyyy/MM/dd(e)-HH:mm"
 
-        private const val KYE_ARGS_TASK_LIST: String = "ARGS_TASK_LIST"
+        private const val KEY_ARGS_TASK_DATE: String = "ARGS_TASK_DATE"
     }
 
     private lateinit var mTaskListAdapter: TaskListAdapter
@@ -33,10 +35,10 @@ class TaskListFragment: Fragment(), AdapterView.OnItemLongClickListener {
      * @param array　ArrayList of tasks to display
      * @return This instance
      */
-    fun newInstance(array: ArrayList<TaskEntity>): TaskListFragment {
+    fun newInstance(date: String, array: ArrayList<TaskEntity>): TaskListFragment {
         val args = Bundle()
         val fragment = TaskListFragment()
-        args.putParcelableArrayList(KYE_ARGS_TASK_LIST, array)
+        args.putString(KEY_ARGS_TASK_DATE, date)
         fragment.arguments = args
         return fragment
     }
@@ -51,8 +53,14 @@ class TaskListFragment: Fragment(), AdapterView.OnItemLongClickListener {
         val view = inflater.inflate(R.layout.fragment_task_list, container, false)
         val args = arguments
         var array: ArrayList<TaskEntity> = arrayListOf()
+        val currentTime = Util.getCurrentLocalDateTime()
         if (args != null) {
-            array = args.getParcelableArrayList<TaskEntity>(KYE_ARGS_TASK_LIST) as ArrayList<TaskEntity>
+            val dateString = args.getString(KEY_ARGS_TASK_DATE, Util.toString(currentTime, FORMAT_PATTERN_DATE_ALL))
+            val data = Util.toLocalDateTime(dateString, FORMAT_PATTERN_DATE_ALL)
+            val activity = activity as MainActivity
+            activity.setToolBarText(data)
+            array = mTaskListListener.getTodayList(data)
+
         }
 
         // set list view
@@ -60,7 +68,7 @@ class TaskListFragment: Fragment(), AdapterView.OnItemLongClickListener {
         listView.onItemLongClickListener = this
         mTaskListAdapter = TaskListAdapter(view.context, array)
         listView.adapter = mTaskListAdapter
-        mTaskListAdapter.setSelectTime(Util.getCurrentLocalDateTime())
+        mTaskListAdapter.setSelectTime(currentTime)
 
         return view
     }
@@ -72,7 +80,7 @@ class TaskListFragment: Fragment(), AdapterView.OnItemLongClickListener {
         position: Int,
         id: Long
     ): Boolean {
-        val strList = arrayOf("削除","編集")
+        val strList = arrayOf("削除", "編集")
 
         AlertDialog.Builder(activity)
             .setTitle("title")

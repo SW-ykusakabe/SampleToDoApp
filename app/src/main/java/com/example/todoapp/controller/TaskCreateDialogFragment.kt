@@ -85,7 +85,7 @@ class TaskCreateDialogFragment: DialogFragment() {
             var taskEntity = args.getParcelable(KEY_ARGS_TASK_ENTITY) as TaskEntity?
             if (taskEntity == null) {
                 val time = Util.getCurrentLocalDateTime()
-                taskEntity = TaskEntity(time, time, "")
+                taskEntity = TaskEntity(time, time, "null")
             }
             val startTime = taskEntity.startTime
             val endTime = taskEntity.endTime

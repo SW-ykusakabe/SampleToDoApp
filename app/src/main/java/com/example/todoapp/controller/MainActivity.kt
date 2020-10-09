@@ -40,19 +40,35 @@ class MainActivity: AppCompatActivity(), View.OnClickListener, OnTaskListListene
         setContentView(R.layout.activity_main)
 
         val currentTimeLocalDateTime = Util.getCurrentLocalDateTime()
-        today_text.text = Util.toString(currentTimeLocalDateTime, FORMAT_PATTERN_DATE_WEEK)
+        setToolBarText(currentTimeLocalDateTime)
 
         // get data
         val appDatabase = AppDatabase.newInstance(this)
         mTaskDao = appDatabase.taskDao()
         if (mTaskDao.getAll().isEmpty()) {
             Log.d(TAG, "onCreate : getData is empty")
-            mTaskDao.insert(TaskDBEntity(0, "2020/10/05(2)-12:00", "2020/10/06(3)-19:00", "Sample Title"))
-            mTaskDao.insert(TaskDBEntity(0, "2020/10/06(3)-12:00", "2020/10/06(3)-19:00", "Sample Title"))
-            mTaskDao.insert(TaskDBEntity(0, "2020/10/06(3)-13:00", "2020/10/07(4)-19:00", "Sample Title"))
-            mTaskDao.insert(TaskDBEntity(0, "2020/10/07(4)-13:00", "2020/10/07(4)-19:00", "Sample Title"))
+
+            // --------------------------------------test data--------------------------------------
+            val calendar = Calendar.getInstance()
+            calendar.add(Calendar.DAY_OF_MONTH, -1)
+            val yesterdayLocalDateTime = Util.toLocalDateTime(date = calendar.time)
+
+            calendar.add(Calendar.DAY_OF_MONTH, 2)
+            val tomorrowLocalDateTime = Util.toLocalDateTime(date = calendar.time)
+
+            val yesterdayStr = Util.toString(yesterdayLocalDateTime, "yyyy/MM/dd(e)-")
+            val currentStr = Util.toString(currentTimeLocalDateTime, "yyyy/MM/dd(e)-")
+            val tomorrowStr = Util.toString(tomorrowLocalDateTime, "yyyy/MM/dd(e)-")
+            val title = "Test data"
+
+            mTaskDao.insert(TaskDBEntity(0, "${yesterdayStr}08:00", "${tomorrowStr}23:00", title))
+            mTaskDao.insert(TaskDBEntity(0, "${yesterdayStr}08:00", "${currentStr}23:00", title))
+            mTaskDao.insert(TaskDBEntity(0, "${currentStr}08:00", "${currentStr}23:00", title))
+            mTaskDao.insert(TaskDBEntity(0, "${currentStr}08:00", "${tomorrowStr}23:00", title))
+            // --------------------------------------test data--------------------------------------
         }
         val array = mTaskDao.getAll()
+        Log.d(TAG, "onCreate : array.size:${array.size}")
 
 
         mAllTaskArrayList = arrayListOf()
@@ -77,8 +93,18 @@ class MainActivity: AppCompatActivity(), View.OnClickListener, OnTaskListListene
         setting_button.setOnClickListener(this)
 
         // fragment
-        mFragmentOnActivity = TaskListFragment().newInstance(mSelectedTaskArrayList)
+        val dataStr = Util.toString(currentTimeLocalDateTime, FORMAT_PATTERN_DATE_ALL)
+        mFragmentOnActivity = TaskListPagerFragment().newInstance(dataStr, mSelectedTaskArrayList)
+//        mFragmentOnActivity = TaskListFragment().newInstance(mSelectedTaskArrayList)
         replaceFragment(mFragmentOnActivity)
+    }
+
+    /** @inheritDoc */
+    override fun getTodayList(date: LocalDateTime): ArrayList<TaskEntity> {
+        Log.d(TAG, "$date")
+        mSelectedTaskArrayList = arrayListOf()
+        extractTasks(date)
+        return mSelectedTaskArrayList
     }
 
     /** @inheritDoc */
@@ -154,7 +180,7 @@ class MainActivity: AppCompatActivity(), View.OnClickListener, OnTaskListListene
         Log.d(TAG, "onChangeListItem : year:$year, month:$month, dayOfWeek:$dayOfWeek")
 
         val selectTimeLocalDateTime = LocalDateTime.of(year, month, dayOfWeek, 0, 0)
-        today_text.text = Util.toString(selectTimeLocalDateTime, FORMAT_PATTERN_DATE_WEEK)
+        setToolBarText(selectTimeLocalDateTime)
 
         mSelectedTaskArrayList.removeAll(mAllTaskArrayList)
         extractTasks(selectTimeLocalDateTime)
@@ -175,23 +201,23 @@ class MainActivity: AppCompatActivity(), View.OnClickListener, OnTaskListListene
             R.id.calendar_day_button -> {
                 task_add_button.visibility = View.VISIBLE
                 val currentTimeLocalDateTime = Util.getCurrentLocalDateTime()
-                today_text.text = Util.toString(currentTimeLocalDateTime, FORMAT_PATTERN_DATE_WEEK)
+                val dateString = Util.toString(currentTimeLocalDateTime, FORMAT_PATTERN_DATE_ALL)
 
                 mSelectedTaskArrayList.removeAll(mAllTaskArrayList)
                 extractTasks(currentTimeLocalDateTime)
 
-                mFragmentOnActivity = TaskListFragment().newInstance(mSelectedTaskArrayList)
+                mFragmentOnActivity = TaskListFragment().newInstance(dateString, mSelectedTaskArrayList)
                 replaceFragment(mFragmentOnActivity)
             }
             R.id.calendar_week_button -> {
                 task_add_button.visibility = View.VISIBLE
                 val currentTimeLocalDateTime = Util.getCurrentLocalDateTime()
-                today_text.text = Util.toString(currentTimeLocalDateTime, FORMAT_PATTERN_DATE_WEEK)
+                val dateString = Util.toString(currentTimeLocalDateTime, FORMAT_PATTERN_DATE_ALL)
 
                 mSelectedTaskArrayList.removeAll(mAllTaskArrayList)
                 extractTasks(currentTimeLocalDateTime)
 
-                mFragmentOnActivity = TaskCalendarFragment().newInstance(mSelectedTaskArrayList)
+                mFragmentOnActivity = TaskCalendarFragment().newInstance(dateString, mSelectedTaskArrayList)
                 replaceFragment(mFragmentOnActivity)
             }
             R.id.setting_button -> {
@@ -204,6 +230,14 @@ class MainActivity: AppCompatActivity(), View.OnClickListener, OnTaskListListene
 
             }
         }
+    }
+
+    /**
+     * setToolBarText - Set date on toolbar
+     * @param date LocalDateTime to set
+     */
+    fun setToolBarText(date: LocalDateTime) {
+        today_text.text = Util.toString(date, FORMAT_PATTERN_DATE_WEEK)
     }
 
     /**

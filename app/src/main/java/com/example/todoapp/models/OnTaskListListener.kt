@@ -6,6 +6,13 @@ import java.time.LocalDateTime
 interface OnTaskListListener {
 
     /**
+     * getTodayList - Get task list today
+     * @param date date
+     * @return today task list
+     */
+    fun getTodayList(date: LocalDateTime): ArrayList<TaskEntity>
+
+    /**
      * onCreateListItem - Create a task
      * @param startDate start time
      * @param endDate end time
