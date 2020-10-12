@@ -32,7 +32,7 @@ class MainActivity: AppCompatActivity(), View.OnClickListener, OnTaskListListene
     private lateinit var mAllTaskArrayList: ArrayList<TaskEntity>
     private lateinit var mSelectedTaskArrayList: ArrayList<TaskEntity>
     private lateinit var mFragmentOnActivity: Fragment
-    private lateinit var  mTaskDao: TaskDao
+    private lateinit var mTaskDao: TaskDao
 
     /** @inheritDoc */
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -94,14 +94,13 @@ class MainActivity: AppCompatActivity(), View.OnClickListener, OnTaskListListene
 
         // fragment
         val dataStr = Util.toString(currentTimeLocalDateTime, FORMAT_PATTERN_DATE_ALL)
-        mFragmentOnActivity = TaskListPagerFragment().newInstance(dataStr, mSelectedTaskArrayList)
+        mFragmentOnActivity = TaskListPagerFragment().newInstance(dataStr)
 //        mFragmentOnActivity = TaskListFragment().newInstance(mSelectedTaskArrayList)
         replaceFragment(mFragmentOnActivity)
     }
 
     /** @inheritDoc */
     override fun getTodayList(date: LocalDateTime): ArrayList<TaskEntity> {
-        Log.d(TAG, "$date")
         mSelectedTaskArrayList = arrayListOf()
         extractTasks(date)
         return mSelectedTaskArrayList
@@ -206,7 +205,8 @@ class MainActivity: AppCompatActivity(), View.OnClickListener, OnTaskListListene
                 mSelectedTaskArrayList.removeAll(mAllTaskArrayList)
                 extractTasks(currentTimeLocalDateTime)
 
-                mFragmentOnActivity = TaskListFragment().newInstance(dateString, mSelectedTaskArrayList)
+                mFragmentOnActivity = TaskListFragment().newInstance(dateString)
+//                mFragmentOnActivity = TaskListPagerFragment().newInstance(dateString, mSelectedTaskArrayList)
                 replaceFragment(mFragmentOnActivity)
             }
             R.id.calendar_week_button -> {
@@ -262,7 +262,7 @@ class MainActivity: AppCompatActivity(), View.OnClickListener, OnTaskListListene
             val endTime = mAllTaskArrayList[i].endTime
             if ((truncateSelectedDateToDays.isEqual(startTime.truncatedTo(ChronoUnit.DAYS))
                         || truncateSelectedDateToDays.isAfter(startTime))
-                && (truncateSelectedDateToDays.isEqual(endTime.truncatedTo((ChronoUnit.DAYS)))
+                && (truncateSelectedDateToDays.isEqual(endTime.truncatedTo(ChronoUnit.DAYS))
                         || truncateSelectedDateToDays.isBefore(endTime))) {
                 mSelectedTaskArrayList.add(mAllTaskArrayList[i])
                 sortList(mSelectedTaskArrayList)
@@ -277,6 +277,7 @@ class MainActivity: AppCompatActivity(), View.OnClickListener, OnTaskListListene
         if (mFragmentOnActivity is TaskListFragment) {
             val fragment = mFragmentOnActivity as TaskListFragment
             fragment.updateAdapter(mSelectedTaskArrayList)
+//            mFragmentOnActivity = TaskListPagerFragment().newInstance("dateString", mSelectedTaskArrayList)
         } else if (mFragmentOnActivity is TaskCalendarFragment) {
             val fragment = mFragmentOnActivity as TaskCalendarFragment
             fragment.updateAdapter(mSelectedTaskArrayList)

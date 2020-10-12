@@ -27,15 +27,16 @@ class TaskListFragment: Fragment(), AdapterView.OnItemLongClickListener {
         private const val KEY_ARGS_TASK_DATE: String = "ARGS_TASK_DATE"
     }
 
+    private lateinit var mSelectedTaskArrayList: ArrayList<TaskEntity>
     private lateinit var mTaskListAdapter: TaskListAdapter
     private lateinit var mTaskListListener: OnTaskListListener
 
     /**
      * newInstance - return to this instance
-     * @param array　ArrayList of tasks to display
+     * @param date　String of today date
      * @return This instance
      */
-    fun newInstance(date: String, array: ArrayList<TaskEntity>): TaskListFragment {
+    fun newInstance(date: String): TaskListFragment {
         val args = Bundle()
         val fragment = TaskListFragment()
         args.putString(KEY_ARGS_TASK_DATE, date)
@@ -52,21 +53,21 @@ class TaskListFragment: Fragment(), AdapterView.OnItemLongClickListener {
         mTaskListListener = context as OnTaskListListener
         val view = inflater.inflate(R.layout.fragment_task_list, container, false)
         val args = arguments
-        var array: ArrayList<TaskEntity> = arrayListOf()
         val currentTime = Util.getCurrentLocalDateTime()
         if (args != null) {
             val dateString = args.getString(KEY_ARGS_TASK_DATE, Util.toString(currentTime, FORMAT_PATTERN_DATE_ALL))
             val data = Util.toLocalDateTime(dateString, FORMAT_PATTERN_DATE_ALL)
-            val activity = activity as MainActivity
-            activity.setToolBarText(data)
-            array = mTaskListListener.getTodayList(data)
+//            val activity = activity as MainActivity
+//            Log.d(TAG, "date:$dateString")
+//            activity.setToolBarText(data)
+            mSelectedTaskArrayList = mTaskListListener.getTodayList(data)
 
         }
 
         // set list view
         val listView = view.findViewById<ListView>(R.id.task_list)
         listView.onItemLongClickListener = this
-        mTaskListAdapter = TaskListAdapter(view.context, array)
+        mTaskListAdapter = TaskListAdapter(view.context, mSelectedTaskArrayList)
         listView.adapter = mTaskListAdapter
         mTaskListAdapter.setSelectTime(currentTime)
 

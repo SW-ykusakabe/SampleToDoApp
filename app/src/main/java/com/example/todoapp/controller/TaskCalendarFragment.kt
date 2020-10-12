@@ -58,7 +58,7 @@ class TaskCalendarFragment: Fragment(), CalendarView.OnDateChangeListener {
             val data = Util.toLocalDateTime(dateString, FORMAT_PATTERN_DATE_ALL)
             array = mTaskListListener.getTodayList(data)
         }
-        mFragment = TaskListFragment().newInstance(dateString, array)
+        mFragment = TaskListFragment().newInstance(dateString)
         replaceFragment(mFragment)
 
         val calendarView = view.findViewById<CalendarView>(R.id.calendar_view)

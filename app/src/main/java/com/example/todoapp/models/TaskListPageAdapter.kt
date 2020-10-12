@@ -6,7 +6,7 @@ import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentStatePagerAdapter
 import com.example.todoapp.Util
 import com.example.todoapp.controller.TaskListFragment
-import com.example.todoapp.entitys.TaskEntity
+import java.time.LocalDateTime
 
 /**
  * TaskListPageAdapter - Adapter for task list pager
@@ -14,11 +14,12 @@ import com.example.todoapp.entitys.TaskEntity
 class TaskListPageAdapter(fm: FragmentManager, behavior: Int) : FragmentStatePagerAdapter(fm, behavior) {
     companion object {
         private val TAG: String = Util.getClassName(object : Any() {}.javaClass.enclosingClass.name)
-        private const val SCROLL_SIZE = 5
+        private const val FORMAT_PATTERN_DATE_ALL: String = "yyyy/MM/dd(e)-HH:mm"
+
+        private const val SCROLL_SIZE = 6
     }
 
-    private lateinit var mDateString: String
-    private lateinit var mArrayList: ArrayList<TaskEntity>
+    private lateinit var mDate: LocalDateTime
 
     /** @inheritDoc */
     override fun getCount(): Int {
@@ -27,60 +28,59 @@ class TaskListPageAdapter(fm: FragmentManager, behavior: Int) : FragmentStatePag
 
     /** @inheritDoc */
     override fun getItem(position: Int): Fragment {
-        when (position) {
+        val dateStr: String = when (position) {
             0 -> {
+                Log.d(TAG, "getItem:0, time:${mDate.minusDays(2)}")
+                Util.toString(mDate.minusDays(2), FORMAT_PATTERN_DATE_ALL)
             }
             1 -> {
+                Log.d(TAG, "getItem:1, time:${mDate.minusDays(1)}")
+                Util.toString(mDate.minusDays(1), FORMAT_PATTERN_DATE_ALL)
             }
             2 -> {
+                Log.d(TAG, "getItem:2, time:${mDate}")
+                Util.toString(mDate, FORMAT_PATTERN_DATE_ALL)
             }
             3 -> {
+                Log.d(TAG, "getItem:3, time:${mDate.plusDays(1)}")
+                Util.toString(mDate.plusDays(1), FORMAT_PATTERN_DATE_ALL)
             }
             4 -> {
+                Log.d(TAG, "getItem:4, time:${mDate.plusDays(2)}")
+                Util.toString(mDate.plusDays(2), FORMAT_PATTERN_DATE_ALL)
+            }
+            5 -> {
+                Log.d(TAG, "getItem:5, time:${mDate.plusDays(3)}")
+                Util.toString(mDate.plusDays(3), FORMAT_PATTERN_DATE_ALL)
+            }
+            else -> {
+                Util.toString(Util.getCurrentLocalDateTime(), FORMAT_PATTERN_DATE_ALL)
             }
         }
-        return TaskListFragment().newInstance(mDateString, mArrayList)
+        return TaskListFragment().newInstance(dateStr)
     }
 
     /**
      * initializeData
      * @param date
      */
-    fun initializeData(date: String) {
-        val currentTime = Util.getCurrentLocalDateTime()
-        mDateString = date
-        mArrayList = arrayListOf(TaskEntity(currentTime, currentTime, "test"))
-
-        for (i in 0 until 5) {
-//            imageList.add(imageFetcher.fetchRandomImage())
-        }
+    fun initializeData(date: LocalDateTime) {
+        mDate = date
     }
 
     /**
      * forwardData
      */
-    fun forwardData() {
+    fun forwardData(date: LocalDateTime) {
+        mDate = date.plusDays(1)
         Log.d(TAG, "forwardData")
-        for (i in 0 until 3) {
-//            imageList.removeAt(0)
-        }
-
-        for (i in 0 until 3) {
-//            imageList.add(imageFetcher.fetchRandomImage())
-        }
     }
 
     /**
      * rewindData
      */
-    fun rewindData() {
+    fun rewindData(date: LocalDateTime) {
+        mDate = date.minusDays(1)
         Log.d(TAG, "rewindData")
-        for (i in 0 until 3) {
-//            imageList.removeAt(5 - i - 1)
-        }
-
-        for (i in 0 until 3) {
-//            imageList.add(0, imageFetcher.fetchRandomImage())
-        }
     }
 }
