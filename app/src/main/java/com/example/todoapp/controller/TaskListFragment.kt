@@ -27,6 +27,7 @@ class TaskListFragment: Fragment(), AdapterView.OnItemLongClickListener {
         private const val KEY_ARGS_TASK_DATE: String = "ARGS_TASK_DATE"
     }
 
+    private lateinit var mDate: LocalDateTime
     private lateinit var mSelectedTaskArrayList: ArrayList<TaskEntity>
     private lateinit var mTaskListAdapter: TaskListAdapter
     private lateinit var mTaskListListener: OnTaskListListener
@@ -56,12 +57,15 @@ class TaskListFragment: Fragment(), AdapterView.OnItemLongClickListener {
         val currentTime = Util.getCurrentLocalDateTime()
         if (args != null) {
             val dateString = args.getString(KEY_ARGS_TASK_DATE, Util.toString(currentTime, FORMAT_PATTERN_DATE_ALL))
-            val data = Util.toLocalDateTime(dateString, FORMAT_PATTERN_DATE_ALL)
+            mDate = Util.toLocalDateTime(dateString, FORMAT_PATTERN_DATE_ALL)
 //            val activity = activity as MainActivity
 //            Log.d(TAG, "date:$dateString")
 //            activity.setToolBarText(data)
-            mSelectedTaskArrayList = mTaskListListener.getTodayList(data)
+            mSelectedTaskArrayList = mTaskListListener.getTodayList(mDate)
+            Log.d(TAG, "TaskListPageAdapter: dataSize=${mSelectedTaskArrayList.size}")
 
+        } else {
+            Log.d(TAG, "TaskListPageAdapter: args is null")
         }
 
         // set list view
@@ -88,11 +92,11 @@ class TaskListFragment: Fragment(), AdapterView.OnItemLongClickListener {
             .setItems(strList) { dialog, which ->
                 when (which) {
                     0 -> {
-                        val array = mTaskListListener.onRemoveListItem(position)
-                        mTaskListAdapter.updateList(array)
+                        mSelectedTaskArrayList = mTaskListListener.onRemoveListItem(mSelectedTaskArrayList[position], mDate)
+                        mTaskListAdapter.updateList(mSelectedTaskArrayList)
                     }
                     1 -> {
-                        mTaskListListener.onEditListItem(position)
+                        mTaskListListener.onEditListItem(mSelectedTaskArrayList[position], position)
                     }
                 }
             }
@@ -106,8 +110,8 @@ class TaskListFragment: Fragment(), AdapterView.OnItemLongClickListener {
      * updateAdapter - Update adapter with arrayList of arguments
      * @param array ArrayList to update
      */
-    fun updateAdapter(array: ArrayList<TaskEntity>) {
-        mTaskListAdapter.updateList(array)
+    fun updateAdapter() {
+        mTaskListAdapter.updateList(mSelectedTaskArrayList)
     }
 
     /**

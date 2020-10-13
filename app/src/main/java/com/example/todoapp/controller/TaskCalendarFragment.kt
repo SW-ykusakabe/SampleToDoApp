@@ -34,7 +34,7 @@ class TaskCalendarFragment: Fragment(), CalendarView.OnDateChangeListener {
      * @param array　ArrayList of tasks to display
      * @return This instance
      */
-    fun newInstance(date: String, array: ArrayList<TaskEntity>): TaskCalendarFragment {
+    fun newInstance(date: String): TaskCalendarFragment {
         val args = Bundle()
         val fragment = TaskCalendarFragment()
         args.putString(KEY_ARGS_TASK_DATE, date)
@@ -88,7 +88,7 @@ class TaskCalendarFragment: Fragment(), CalendarView.OnDateChangeListener {
      * updateAdapter - Update adapter with arrayList of arguments
      * @param array ArrayList to update
      */
-    fun updateAdapter(array: ArrayList<TaskEntity>) {
-        mFragment.updateAdapter(array)
+    fun updateAdapter() {
+        mFragment.updateAdapter()
     }
 }

@@ -13,13 +13,14 @@ import com.example.todoapp.Util
 import java.time.DateTimeException
 import java.time.LocalDateTime
 import java.util.*
+import kotlin.Any as KotlinAny
 
 /**
  * TaskCreateDialogFragment -  Dialog fragment for task creation
  */
 class TaskCreateDialogFragment: DialogFragment() {
     companion object {
-        private val TAG: String = Util.getClassName(object : Any() {}.javaClass.enclosingClass.name)
+        private val TAG: String = Util.getClassName(object : KotlinAny() {}.javaClass.enclosingClass.name)
 
         private const val FORMAT_PATTERN_YEAR: String = "yyyy"
         private const val FORMAT_PATTERN_MONTH: String = "MM"
@@ -77,12 +78,14 @@ class TaskCreateDialogFragment: DialogFragment() {
 
         var isEdit = false
         var editPosition = -1
+        val currentTime = Util.getCurrentLocalDateTime()
+        var taskEntity: TaskEntity? = TaskEntity(currentTime, currentTime, "")
 
         if (args != null) {
             isEdit = args.getBoolean(KEY_ARGS_EDIT, false)
             editPosition = args.getInt(KEY_ARGS_EDIT_POSITION, -1)
 
-            var taskEntity = args.getParcelable(KEY_ARGS_TASK_ENTITY) as TaskEntity?
+            taskEntity = args.getParcelable(KEY_ARGS_TASK_ENTITY) as TaskEntity?
             if (taskEntity == null) {
                 val time = Util.getCurrentLocalDateTime()
                 taskEntity = TaskEntity(time, time, "null")
@@ -186,7 +189,7 @@ class TaskCreateDialogFragment: DialogFragment() {
                 }
 
                 if (isEdit) {
-                    mTaskListListener.onRemoveListItem(editPosition)
+                    mTaskListListener.onRemoveListItem(taskEntity, Util.getCurrentLocalDateTime())
                 }
                 mTaskListListener.onCreateListItem(startLocalDateTime, endLocalDateTime, title)
             }

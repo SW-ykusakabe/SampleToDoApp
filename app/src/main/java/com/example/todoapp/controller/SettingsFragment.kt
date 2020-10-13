@@ -62,7 +62,7 @@ class SettingsFragment: Fragment(), View.OnClickListener {
                     .setTitle("Delete all list")
                     .setMessage("Do you really want to delete task list?")
                     .setPositiveButton("OK") { dialog, which ->
-                        mTaskListListener.onRemoveListItem(-1)
+                        mTaskListListener.onRemoveListItem(null, Util.getCurrentLocalDateTime())
                     }
                     .setNegativeButton("Cancel", null)
                     .show()

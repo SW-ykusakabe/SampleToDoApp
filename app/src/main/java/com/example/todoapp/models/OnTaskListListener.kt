@@ -22,16 +22,18 @@ interface OnTaskListListener {
 
     /**
      * onRemoveListItem - Remove the task
-     * @param position Location of list to remove
+     * @param taskEntity TaskEntity
+     * @param date
      * @return list after remove
      */
-    fun onRemoveListItem(position: Int): ArrayList<TaskEntity>
+    fun onRemoveListItem(taskEntity: TaskEntity?, date: LocalDateTime): ArrayList<TaskEntity>
 
     /**
      * onEditListItem - Edit a task
+     * @param taskEntity TaskEntity
      * @param position Location of list to edit
      */
-    fun onEditListItem(position: Int)
+    fun onEditListItem(taskEntity: TaskEntity, position: Int)
 
     /**
      * onChangeListItem - Change the task to be displayed

@@ -16,7 +16,7 @@ import java.time.LocalDateTime
  */
 class TaskListPagerFragment: Fragment(), ViewPager.OnPageChangeListener {
     companion object {
-        private val TAG: String = Util.getClassName(object : Any() {}.javaClass.enclosingClass.name)
+        private val TAG: String = Util.getClassName(tag = object : Any() {}.javaClass.enclosingClass.name)
         private const val FORMAT_PATTERN_DATE_ALL: String = "yyyy/MM/dd(e)-HH:mm"
 
         private const val KEY_ARGS_TASK_DATE: String = "ARGS_TASK_DATE"
@@ -41,6 +41,39 @@ class TaskListPagerFragment: Fragment(), ViewPager.OnPageChangeListener {
         args.putString(KEY_ARGS_TASK_DATE, date)
         fragment.arguments = args
         return fragment
+    }
+
+    /** @inheritDoc */
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        mListener = this
+        val view = inflater.inflate(R.layout.fragment_viewpager, container, false)
+
+        // setting viewPager
+        val viewPager = view.findViewById<ViewPager>(R.id.view_pager)
+
+        mAdapter = TaskListPageAdapter(childFragmentManager, 0)
+
+        // get data
+        val args = arguments
+        if (args != null) {
+            val dateString = args.getString(KEY_ARGS_TASK_DATE, Util.toString(Util.getCurrentLocalDateTime(), FORMAT_PATTERN_DATE_ALL))
+            val data = Util.toLocalDateTime(dateString, FORMAT_PATTERN_DATE_ALL)
+            mAdapter.initializeData(data)
+            mDisplayedDate = data
+        }
+
+        mScrollSize = mAdapter.count
+        viewPager.adapter = mAdapter
+        viewPager.setCurrentItem(START_POSITION, false)
+        mPosition = START_POSITION
+
+        viewPager.addOnPageChangeListener(mListener)
+
+        return view
     }
 
     /** @inheritDoc */
@@ -82,35 +115,5 @@ class TaskListPagerFragment: Fragment(), ViewPager.OnPageChangeListener {
             view_pager.setCurrentItem(jumpPosition, false);
             jumpPosition = -1;
         }
-    }
-
-    /** @inheritDoc */
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        mListener = this
-        val view = inflater.inflate(R.layout.fragment_viewpager, container, false)
-
-        val viewPager = view.findViewById<ViewPager>(R.id.view_pager)
-
-        mAdapter = TaskListPageAdapter(childFragmentManager, 0)
-        val args = arguments
-        var dateString = ""
-        if (args != null) {
-            dateString = args.getString(KEY_ARGS_TASK_DATE, Util.toString(Util.getCurrentLocalDateTime(), FORMAT_PATTERN_DATE_ALL))
-            val data = Util.toLocalDateTime(dateString, FORMAT_PATTERN_DATE_ALL)
-            mAdapter.initializeData(data)
-            mDisplayedDate = data
-        }
-        mScrollSize = mAdapter.count
-        viewPager.adapter = mAdapter
-        viewPager.setCurrentItem(START_POSITION, false)
-        mPosition = START_POSITION
-
-        viewPager.addOnPageChangeListener(mListener)
-
-        return view
     }
 }

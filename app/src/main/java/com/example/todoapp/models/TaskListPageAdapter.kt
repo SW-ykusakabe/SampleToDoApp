@@ -1,6 +1,7 @@
 package com.example.todoapp.models
 
 import android.util.Log
+import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentStatePagerAdapter
@@ -28,6 +29,7 @@ class TaskListPageAdapter(fm: FragmentManager, behavior: Int) : FragmentStatePag
 
     /** @inheritDoc */
     override fun getItem(position: Int): Fragment {
+        Log.d(TAG, "getItem")
         val dateStr: String = when (position) {
             0 -> {
                 Log.d(TAG, "getItem:0, time:${mDate.minusDays(2)}")
@@ -60,6 +62,10 @@ class TaskListPageAdapter(fm: FragmentManager, behavior: Int) : FragmentStatePag
         return TaskListFragment().newInstance(dateStr)
     }
 
+    override fun setPrimaryItem(container: ViewGroup, position: Int, `object`: Any) {
+        super.setPrimaryItem(container, position, `object`)
+    }
+
     /**
      * initializeData
      * @param date
@@ -70,6 +76,7 @@ class TaskListPageAdapter(fm: FragmentManager, behavior: Int) : FragmentStatePag
 
     /**
      * forwardData
+     * @param data
      */
     fun forwardData(date: LocalDateTime) {
         mDate = date.plusDays(1)
