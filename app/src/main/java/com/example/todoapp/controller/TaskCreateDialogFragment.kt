@@ -43,17 +43,20 @@ class TaskCreateDialogFragment: DialogFragment() {
      * @return This instance
      */
     fun newInstance(isEdit: Boolean, pos: Int, taskEntity: TaskEntity): TaskCreateDialogFragment {
+        Log.d(TAG, "newInstance <start>")
         val args = Bundle()
         val fragment = TaskCreateDialogFragment()
         args.putBoolean(KEY_ARGS_EDIT, isEdit)
         args.putInt(KEY_ARGS_EDIT_POSITION, pos)
         args.putParcelable(KEY_ARGS_TASK_ENTITY, taskEntity)
         fragment.arguments = args
+        Log.d(TAG, "newInstance <end>")
         return fragment
     }
 
     /** @inheritDoc */
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        Log.d(TAG, "onCreateDialog <start>")
         mTaskListListener = context as OnTaskListListener
 
         val args = arguments
@@ -138,7 +141,7 @@ class TaskCreateDialogFragment: DialogFragment() {
                     )
                 } catch (e: DateTimeException) {
                     Log.e(TAG, "e:${e}")
-                    simpleDialog("start time set error", "$e", "close")
+                    simpleDialog("start time set error", "$e")
                     return@setPositiveButton
                 }
                 val startCalendar = Calendar.getInstance()
@@ -177,7 +180,7 @@ class TaskCreateDialogFragment: DialogFragment() {
 //                        LocalDateTime.of(year = 2020, month = 10, dayOfMonth = 1, hour = 11, minute = 0)
                     } catch (e: DateTimeException) {
                         Log.e(TAG, "e:${e}")
-                        simpleDialog("end time set error", "$e", "close")
+                        simpleDialog("end time set error", "$e")
                         return@setPositiveButton
                     }
                 }
@@ -191,21 +194,23 @@ class TaskCreateDialogFragment: DialogFragment() {
                 if (isEdit) {
                     mTaskListListener.onRemoveListItem(taskEntity, Util.getCurrentLocalDateTime())
                 }
-                mTaskListListener.onCreateListItem(startLocalDateTime, endLocalDateTime, title)
+                mTaskListListener.onAddListItem(startLocalDateTime, endLocalDateTime, title)
             }
             .setNegativeButton("Cancel") { _, _ ->
             }
-
+        Log.d(TAG, "onCreateDialog <end>")
         return builder.create()
     }
 
-    private fun simpleDialog(title: String, message: String, buttonName: String) {
+    private fun simpleDialog(title: String, message: String, buttonName: String = "close") {
+        Log.d(TAG, "simpleDialog <start>")
         AlertDialog.Builder(context)
             .setTitle(title)
             .setMessage(message)
             .setPositiveButton(buttonName) { _, _ ->
             }
             .show()
+        Log.d(TAG, "simpleDialog <end>")
     }
 
 }

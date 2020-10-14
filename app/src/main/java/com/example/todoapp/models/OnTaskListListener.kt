@@ -18,7 +18,7 @@ interface OnTaskListListener {
      * @param endDate end time
      * @param title title
      */
-    fun onCreateListItem(startDate: LocalDateTime, endDate: LocalDateTime, title: String)
+    fun onAddListItem(startDate: LocalDateTime, endDate: LocalDateTime, title: String)
 
     /**
      * onRemoveListItem - Remove the task
@@ -26,7 +26,7 @@ interface OnTaskListListener {
      * @param date
      * @return list after remove
      */
-    fun onRemoveListItem(taskEntity: TaskEntity?, date: LocalDateTime): ArrayList<TaskEntity>
+    fun onRemoveListItem(taskEntity: TaskEntity?, date: LocalDateTime)
 
     /**
      * onEditListItem - Edit a task

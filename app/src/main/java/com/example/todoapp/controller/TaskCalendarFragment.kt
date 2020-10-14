@@ -35,10 +35,12 @@ class TaskCalendarFragment: Fragment(), CalendarView.OnDateChangeListener {
      * @return This instance
      */
     fun newInstance(date: String): TaskCalendarFragment {
+        Log.d(TAG, "newInstance <start>")
         val args = Bundle()
         val fragment = TaskCalendarFragment()
         args.putString(KEY_ARGS_TASK_DATE, date)
         fragment.arguments = args
+        Log.d(TAG, "newInstance <end>")
         return fragment
     }
 
@@ -48,6 +50,7 @@ class TaskCalendarFragment: Fragment(), CalendarView.OnDateChangeListener {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        Log.d(TAG, "onCreateView <start>")
         mTaskListListener = context as OnTaskListListener
         val view = inflater.inflate(R.layout.fragment_task_calendar, container, false)
         val args = arguments
@@ -63,14 +66,21 @@ class TaskCalendarFragment: Fragment(), CalendarView.OnDateChangeListener {
 
         val calendarView = view.findViewById<CalendarView>(R.id.calendar_view)
         calendarView.setOnDateChangeListener(this)
+        Log.d(TAG, "onCreateView <end>")
         return view
     }
 
     /** @inheritDoc */
     override fun onSelectedDayChange(view: CalendarView, year: Int, month: Int, dayOfMonth: Int) {
+        Log.d(TAG, "onSelectedDayChange <start>")
         Log.d(TAG, "onSelectedDayChange : year:$year, month:${month + 1}, dayOfMonth:$dayOfMonth")
+
+//        val selectTimeLocalDateTime = LocalDateTime.of(year, month, dayOfMonth, 0, 0)
+//        mTaskListListener.getTodayList(selectTimeLocalDateTime)
+
         mTaskListListener.onChangeListItem(year, month + 1, dayOfMonth)
         mFragment.setSelectTime(LocalDateTime.of(year, month + 1, dayOfMonth, 0, 0))
+        Log.d(TAG, "onSelectedDayChange <end>")
     }
 
     /**
@@ -78,10 +88,12 @@ class TaskCalendarFragment: Fragment(), CalendarView.OnDateChangeListener {
      * @param fragment Fragment to display
      */
     private fun replaceFragment(fragment: Fragment) {
+        Log.d(TAG, "replaceFragment <start>")
         val fragmentManager: FragmentManager = childFragmentManager
         val fragmentTransaction: FragmentTransaction = fragmentManager.beginTransaction()
         fragmentTransaction.replace(R.id.list_container, fragment)
         fragmentTransaction.commit()
+        Log.d(TAG, "replaceFragment <end>")
     }
 
     /**
@@ -89,6 +101,8 @@ class TaskCalendarFragment: Fragment(), CalendarView.OnDateChangeListener {
      * @param array ArrayList to update
      */
     fun updateAdapter() {
+        Log.d(TAG, "updateAdapter <start>")
         mFragment.updateAdapter()
+        Log.d(TAG, "updateAdapter <end>")
     }
 }

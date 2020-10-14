@@ -29,7 +29,7 @@ class TaskListPageAdapter(fm: FragmentManager, behavior: Int) : FragmentStatePag
 
     /** @inheritDoc */
     override fun getItem(position: Int): Fragment {
-        Log.d(TAG, "getItem")
+        Log.d(TAG, "getItem <start>")
         val dateStr: String = when (position) {
             0 -> {
                 Log.d(TAG, "getItem:0, time:${mDate.minusDays(2)}")
@@ -59,11 +59,14 @@ class TaskListPageAdapter(fm: FragmentManager, behavior: Int) : FragmentStatePag
                 Util.toString(Util.getCurrentLocalDateTime(), FORMAT_PATTERN_DATE_ALL)
             }
         }
+        Log.d(TAG, "getItem <end>")
         return TaskListFragment().newInstance(dateStr)
     }
 
     override fun setPrimaryItem(container: ViewGroup, position: Int, `object`: Any) {
+        Log.d(TAG, "setPrimaryItem <start>")
         super.setPrimaryItem(container, position, `object`)
+        Log.d(TAG, "setPrimaryItem <end>")
     }
 
     /**
@@ -71,7 +74,9 @@ class TaskListPageAdapter(fm: FragmentManager, behavior: Int) : FragmentStatePag
      * @param date
      */
     fun initializeData(date: LocalDateTime) {
+        Log.d(TAG, "initializeData <start>")
         mDate = date
+        Log.d(TAG, "initializeData <end>")
     }
 
     /**
@@ -79,15 +84,17 @@ class TaskListPageAdapter(fm: FragmentManager, behavior: Int) : FragmentStatePag
      * @param data
      */
     fun forwardData(date: LocalDateTime) {
+        Log.d(TAG, "forwardData <start>")
         mDate = date.plusDays(1)
-        Log.d(TAG, "forwardData")
+        Log.d(TAG, "forwardData <end>")
     }
 
     /**
      * rewindData
      */
     fun rewindData(date: LocalDateTime) {
+        Log.d(TAG, "rewindData <start>")
         mDate = date.minusDays(1)
-        Log.d(TAG, "rewindData")
+        Log.d(TAG, "rewindData <end>")
     }
 }

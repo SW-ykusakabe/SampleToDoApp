@@ -26,10 +26,12 @@ class SettingsFragment: Fragment(), View.OnClickListener {
      * @return This instance
      */
     fun newInstance(): SettingsFragment {
+        Log.d(TAG, "newInstance <start>")
         val args = Bundle()
         val fragment = SettingsFragment()
         args.putString("ARGS_KEY", "")
         fragment.arguments = args
+        Log.d(TAG, "newInstance <end>")
         return fragment
     }
 
@@ -39,6 +41,7 @@ class SettingsFragment: Fragment(), View.OnClickListener {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        Log.d(TAG, "onCreateView <start>")
         mTaskListListener = context as OnTaskListListener
         val view = inflater.inflate(R.layout.fragment_settings, container, false)
 //        val args = arguments
@@ -50,11 +53,13 @@ class SettingsFragment: Fragment(), View.OnClickListener {
         val button = view.findViewById<Button>(R.id.button)
         button.setOnClickListener(this)
 
+        Log.d(TAG, "onCreateView <end>")
         return view
     }
 
     /** @inheritDoc */
     override fun onClick(v: View) {
+        Log.d(TAG, "onClick <start>")
         when(v.id) {
             R.id.button -> {
                 Log.d(TAG, "onClick : button")
@@ -68,5 +73,6 @@ class SettingsFragment: Fragment(), View.OnClickListener {
                     .show()
             }
         }
+        Log.d(TAG, "onClick <end>")
     }
 }

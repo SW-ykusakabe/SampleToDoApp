@@ -35,6 +35,7 @@ class MainActivity: AppCompatActivity(), View.OnClickListener, OnTaskListListene
 
     /** @inheritDoc */
     override fun onCreate(savedInstanceState: Bundle?) {
+        Log.d(TAG, "onCreate <start>")
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
@@ -95,16 +96,21 @@ class MainActivity: AppCompatActivity(), View.OnClickListener, OnTaskListListene
         mFragmentOnActivity = TaskListPagerFragment().newInstance(dataStr)
 //        mFragmentOnActivity = TaskListFragment().newInstance(mSelectedTaskArrayList)
         replaceFragment(mFragmentOnActivity)
+        Log.d(TAG, "onCreate <end>")
     }
 
     /** @inheritDoc */
     override fun getTodayList(date: LocalDateTime): ArrayList<TaskEntity> {
-        return extractTasks(date)
+        Log.d(TAG, "getTodayList <start>")
+        val array = extractTasks(date)
+        Log.d(TAG, "getTodayList <end>")
+        return array
     }
 
     /** @inheritDoc */
-    override fun onCreateListItem(startDate: LocalDateTime, endDate: LocalDateTime, title: String) {
-        Log.d(TAG, "onCreateListItem : startDate:$startDate, endDate:$endDate, title:$title")
+    override fun onAddListItem(startDate: LocalDateTime, endDate: LocalDateTime, title: String) {
+        Log.d(TAG, "onAddListItem <start>")
+        Log.d(TAG, "onAddListItem : startDate:$startDate, endDate:$endDate, title:$title")
         mTaskDao.insert(TaskDBEntity(
             0,
             Util.toString(startDate, FORMAT_PATTERN_DATE_ALL),
@@ -113,38 +119,47 @@ class MainActivity: AppCompatActivity(), View.OnClickListener, OnTaskListListene
         mAllTaskArrayList.add(TaskEntity(startDate, endDate, title))
         sortList(mAllTaskArrayList)
 
-//        extractTasks(Util.getCurrentLocalDateTime())
+        Log.d(TAG, "onAddListItem <end>")
     }
 
     /** @inheritDoc */
-    override fun onRemoveListItem(taskEntity: TaskEntity?, date: LocalDateTime): ArrayList<TaskEntity> {
+    override fun onRemoveListItem(taskEntity: TaskEntity?, date: LocalDateTime) {
+        Log.d(TAG, "onRemoveListItem <start>")
         Log.d(TAG, "onRemoveListItem : date:$date")
         if (taskEntity == null) {
+            Log.d(TAG, "onRemoveListItem : taskEntity is null")
             mTaskDao.deleteAll()
             mAllTaskArrayList.removeAll(mAllTaskArrayList)
         } else {
+            Log.d(TAG, "onRemoveListItem : remove start")
             val array = mTaskDao.getTasksAll(
                 Util.toString(taskEntity.startTime, FORMAT_PATTERN_DATE_ALL),
                 Util.toString(taskEntity.endTime, FORMAT_PATTERN_DATE_ALL),
                 taskEntity.title)
+            Log.d(TAG, "onRemoveListItem : arraySize=${array.size}")
             mTaskDao.delete(array[0].id)
             mAllTaskArrayList.remove(taskEntity)
+            Log.d(TAG, "onRemoveListItem : mAllTaskArrayList.size=${mAllTaskArrayList.size}")
+            Log.d(TAG, "onRemoveListItem : remove end")
         }
-        return  extractTasks(date)
+        Log.d(TAG, "onRemoveListItem <end>")
     }
 
     /** @inheritDoc */
     override fun onEditListItem(taskEntity: TaskEntity, position: Int) {
+        Log.d(TAG, "onEditListItem <start>")
         val dialog = TaskCreateDialogFragment().newInstance(
             true,
             position,
             taskEntity
         )
         dialog.show(supportFragmentManager, "create")
+        Log.d(TAG, "onEditListItem <end>")
     }
 
     /** @inheritDoc */
     override fun onChangeListItem(year: Int, month: Int, dayOfWeek: Int) {
+        Log.d(TAG, "onEditListItem <start>")
         Log.d(TAG, "onChangeListItem : year:$year, month:$month, dayOfWeek:$dayOfWeek")
 
         val selectTimeLocalDateTime = LocalDateTime.of(year, month, dayOfWeek, 0, 0)
@@ -154,10 +169,12 @@ class MainActivity: AppCompatActivity(), View.OnClickListener, OnTaskListListene
 
         // update list
         updateList()
+        Log.d(TAG, "onEditListItem <end>")
     }
 
     @Override
     override fun onClick(v: View) {
+        Log.d(TAG, "onClick <start>")
         when (v.id) {
             R.id.task_add_button -> {
                 val args = Bundle()
@@ -198,6 +215,7 @@ class MainActivity: AppCompatActivity(), View.OnClickListener, OnTaskListListene
 
             }
         }
+        Log.d(TAG, "onClick <end>")
     }
 
     /**
@@ -205,7 +223,9 @@ class MainActivity: AppCompatActivity(), View.OnClickListener, OnTaskListListene
      * @param date LocalDateTime to set
      */
     fun setToolBarText(date: LocalDateTime) {
+        Log.d(TAG, "setToolBarText <start>")
         today_text.text = Util.toString(date, FORMAT_PATTERN_DATE_WEEK)
+        Log.d(TAG, "setToolBarText <end>")
     }
 
     /**
@@ -213,10 +233,12 @@ class MainActivity: AppCompatActivity(), View.OnClickListener, OnTaskListListene
      * @param fragment Fragment to display
      */
     private fun replaceFragment(fragment: Fragment) {
+        Log.d(TAG, "replaceFragment <start>")
         val fragmentManager: FragmentManager = supportFragmentManager
         val fragmentTransaction: FragmentTransaction = fragmentManager.beginTransaction()
         fragmentTransaction.replace(R.id.container, fragment)
         fragmentTransaction.commit()
+        Log.d(TAG, "replaceFragment <end>")
     }
 
     /**
@@ -224,6 +246,7 @@ class MainActivity: AppCompatActivity(), View.OnClickListener, OnTaskListListene
      * @param selectDate　Date to display
      */
     private fun extractTasks(selectDate: LocalDateTime): ArrayList<TaskEntity> {
+        Log.d(TAG, "extractTasks <start>")
         val truncateSelectedDateToDays = selectDate.truncatedTo(ChronoUnit.DAYS)
         val array: ArrayList<TaskEntity> = arrayListOf()
         for (i in 0 until mAllTaskArrayList.size) {
@@ -237,6 +260,7 @@ class MainActivity: AppCompatActivity(), View.OnClickListener, OnTaskListListene
                 sortList(array)
             }
         }
+        Log.d(TAG, "extractTasks <end>")
         return array
     }
 
@@ -244,6 +268,7 @@ class MainActivity: AppCompatActivity(), View.OnClickListener, OnTaskListListene
      * updateList - Update the displayed list
      */
     private fun updateList() {
+        Log.d(TAG, "updateList <start>")
         if (mFragmentOnActivity is TaskListFragment) {
             val fragment = mFragmentOnActivity as TaskListFragment
             fragment.updateAdapter()
@@ -252,6 +277,7 @@ class MainActivity: AppCompatActivity(), View.OnClickListener, OnTaskListListene
             val fragment = mFragmentOnActivity as TaskCalendarFragment
             fragment.updateAdapter()
         }
+        Log.d(TAG, "updateList <end>")
     }
 
     /**
@@ -259,6 +285,8 @@ class MainActivity: AppCompatActivity(), View.OnClickListener, OnTaskListListene
      * @param array ArrayList of TaskEntity class you want to sort
      */
     private fun sortList(array: ArrayList<TaskEntity>) {
+        Log.d(TAG, "sortList <start>")
         Collections.sort(array, TaskListComparator())
+        Log.d(TAG, "sortList <end>")
     }
 }

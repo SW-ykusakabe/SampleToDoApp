@@ -36,10 +36,12 @@ class TaskListPagerFragment: Fragment(), ViewPager.OnPageChangeListener {
      * @return This instance
      */
     fun newInstance(date: String): TaskListPagerFragment {
+        Log.d(TAG, "newInstance <start>")
         val args = Bundle()
         val fragment = TaskListPagerFragment()
         args.putString(KEY_ARGS_TASK_DATE, date)
         fragment.arguments = args
+        Log.d(TAG, "newInstance <end>")
         return fragment
     }
 
@@ -49,6 +51,7 @@ class TaskListPagerFragment: Fragment(), ViewPager.OnPageChangeListener {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        Log.d(TAG, "onCreateView <start>")
         mListener = this
         val view = inflater.inflate(R.layout.fragment_viewpager, container, false)
 
@@ -73,11 +76,13 @@ class TaskListPagerFragment: Fragment(), ViewPager.OnPageChangeListener {
 
         viewPager.addOnPageChangeListener(mListener)
 
+        Log.d(TAG, "onCreateView <end>")
         return view
     }
 
     /** @inheritDoc */
     override fun onPageSelected(position: Int) {
+        Log.d(TAG, "onPageSelected <start>")
         Log.d(TAG, "onPageSelected : position:$position")
 
         val activity = activity as MainActivity
@@ -102,6 +107,7 @@ class TaskListPagerFragment: Fragment(), ViewPager.OnPageChangeListener {
             mAdapter.forwardData(mDisplayedDate)
         }
         mPosition = position
+        Log.d(TAG, "onPageSelected <end>")
     }
 
     /** @inheritDoc */
@@ -110,10 +116,12 @@ class TaskListPagerFragment: Fragment(), ViewPager.OnPageChangeListener {
 
     /** @inheritDoc */
     override fun onPageScrollStateChanged(state: Int) {
+        Log.d(TAG, "onPageScrollStateChanged <start>")
         Log.d(TAG, "onPageScrollStateChanged : state:$state")
         if (state == ViewPager.SCROLL_STATE_IDLE && jumpPosition >= 0) {
             view_pager.setCurrentItem(jumpPosition, false);
             jumpPosition = -1;
         }
+        Log.d(TAG, "onPageScrollStateChanged <end>")
     }
 }
