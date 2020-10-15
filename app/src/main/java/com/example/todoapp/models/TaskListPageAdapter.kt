@@ -5,6 +5,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentStatePagerAdapter
+import androidx.viewpager.widget.PagerAdapter
 import com.example.todoapp.Util
 import com.example.todoapp.controller.TaskListFragment
 import java.time.LocalDateTime
@@ -20,7 +21,17 @@ class TaskListPageAdapter(fm: FragmentManager, behavior: Int) : FragmentStatePag
         private const val SCROLL_SIZE = 6
     }
 
+    private lateinit var mListener: OnCurrentItemChangeListener
     private lateinit var mDate: LocalDateTime
+    private var mLastActionedPrimaryItemPosition = -1
+
+
+    interface OnCurrentItemChangeListener {
+        fun getViewForPageSelected(
+            container: ViewGroup, `object`: Any,
+            position: Int
+        )
+    }
 
     /** @inheritDoc */
     override fun getCount(): Int {
@@ -63,10 +74,22 @@ class TaskListPageAdapter(fm: FragmentManager, behavior: Int) : FragmentStatePag
         return TaskListFragment().newInstance(dateStr)
     }
 
+    /** @inheritDoc */
+    override fun getItemPosition(`object`: Any): Int {
+        return PagerAdapter.POSITION_NONE
+    }
+
     override fun setPrimaryItem(container: ViewGroup, position: Int, `object`: Any) {
         Log.d(TAG, "setPrimaryItem <start>")
-        super.setPrimaryItem(container, position, `object`)
+        if (mLastActionedPrimaryItemPosition !== position) {
+            mListener.getViewForPageSelected(container, `object`, position)
+            mLastActionedPrimaryItemPosition = position
+        }
         Log.d(TAG, "setPrimaryItem <end>")
+    }
+
+    fun setOnCurrentItemChangeListener(listener: OnCurrentItemChangeListener) {
+        mListener = listener
     }
 
     /**
@@ -81,7 +104,7 @@ class TaskListPageAdapter(fm: FragmentManager, behavior: Int) : FragmentStatePag
 
     /**
      * forwardData
-     * @param data
+     * @param date
      */
     fun forwardData(date: LocalDateTime) {
         Log.d(TAG, "forwardData <start>")

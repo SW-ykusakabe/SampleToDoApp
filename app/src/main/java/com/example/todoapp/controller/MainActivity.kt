@@ -82,9 +82,6 @@ class MainActivity: AppCompatActivity(), View.OnClickListener, OnTaskListListene
         }
         sortList(mAllTaskArrayList)
 
-//        mSelectedTaskArrayList = arrayListOf()
-//        extractTasks(currentTimeLocalDateTime)
-
         // set listener
         task_add_button.setOnClickListener(this)
         calendar_day_button.setOnClickListener(this)
@@ -94,7 +91,6 @@ class MainActivity: AppCompatActivity(), View.OnClickListener, OnTaskListListene
         // create fragment
         val dataStr = Util.toString(currentTimeLocalDateTime, FORMAT_PATTERN_DATE_ALL)
         mFragmentOnActivity = TaskListPagerFragment().newInstance(dataStr)
-//        mFragmentOnActivity = TaskListFragment().newInstance(mSelectedTaskArrayList)
         replaceFragment(mFragmentOnActivity)
         Log.d(TAG, "onCreate <end>")
     }
@@ -102,7 +98,20 @@ class MainActivity: AppCompatActivity(), View.OnClickListener, OnTaskListListene
     /** @inheritDoc */
     override fun getTodayList(date: LocalDateTime): ArrayList<TaskEntity> {
         Log.d(TAG, "getTodayList <start>")
-        val array = extractTasks(date)
+        val array: ArrayList<TaskEntity> = arrayListOf()
+        val truncateSelectedDateToDays = date.truncatedTo(ChronoUnit.DAYS)
+
+        for (i in 0 until mAllTaskArrayList.size) {
+            val startTime = mAllTaskArrayList[i].startTime
+            val endTime = mAllTaskArrayList[i].endTime
+            if ((truncateSelectedDateToDays.isEqual(startTime.truncatedTo(ChronoUnit.DAYS))
+                        || truncateSelectedDateToDays.isAfter(startTime))
+                && (truncateSelectedDateToDays.isEqual(endTime.truncatedTo(ChronoUnit.DAYS))
+                        || truncateSelectedDateToDays.isBefore(endTime))) {
+                array.add(mAllTaskArrayList[i])
+                sortList(array)
+            }
+        }
         Log.d(TAG, "getTodayList <end>")
         return array
     }
@@ -117,7 +126,9 @@ class MainActivity: AppCompatActivity(), View.OnClickListener, OnTaskListListene
             Util.toString(endDate, FORMAT_PATTERN_DATE_ALL),
             title))
         mAllTaskArrayList.add(TaskEntity(startDate, endDate, title))
+
         sortList(mAllTaskArrayList)
+        updateList()
 
         Log.d(TAG, "onAddListItem <end>")
     }
@@ -136,12 +147,11 @@ class MainActivity: AppCompatActivity(), View.OnClickListener, OnTaskListListene
                 Util.toString(taskEntity.startTime, FORMAT_PATTERN_DATE_ALL),
                 Util.toString(taskEntity.endTime, FORMAT_PATTERN_DATE_ALL),
                 taskEntity.title)
-            Log.d(TAG, "onRemoveListItem : arraySize=${array.size}")
             mTaskDao.delete(array[0].id)
             mAllTaskArrayList.remove(taskEntity)
-            Log.d(TAG, "onRemoveListItem : mAllTaskArrayList.size=${mAllTaskArrayList.size}")
-            Log.d(TAG, "onRemoveListItem : remove end")
         }
+
+        updateList()
         Log.d(TAG, "onRemoveListItem <end>")
     }
 
@@ -165,10 +175,6 @@ class MainActivity: AppCompatActivity(), View.OnClickListener, OnTaskListListene
         val selectTimeLocalDateTime = LocalDateTime.of(year, month, dayOfWeek, 0, 0)
         setToolBarText(selectTimeLocalDateTime)
 
-        extractTasks(selectTimeLocalDateTime)
-
-        // update list
-        updateList()
         Log.d(TAG, "onEditListItem <end>")
     }
 
@@ -177,35 +183,30 @@ class MainActivity: AppCompatActivity(), View.OnClickListener, OnTaskListListene
         Log.d(TAG, "onClick <start>")
         when (v.id) {
             R.id.task_add_button -> {
-                val args = Bundle()
+                Log.d(TAG, "onClick : clicked task_add_button")
                 val dialog = TaskCreateDialogFragment()
-                dialog.arguments = args
                 dialog.show(supportFragmentManager, "create")
             }
             R.id.calendar_day_button -> {
+                Log.d(TAG, "onClick : clicked calendar_day_button")
                 task_add_button.visibility = View.VISIBLE
                 val currentTimeLocalDateTime = Util.getCurrentLocalDateTime()
                 val dateString = Util.toString(currentTimeLocalDateTime, FORMAT_PATTERN_DATE_ALL)
 
-//                mSelectedTaskArrayList.removeAll(mAllTaskArrayList)
-                extractTasks(currentTimeLocalDateTime)
-
-//                mFragmentOnActivity = TaskListFragment().newInstance(dateString)
                 mFragmentOnActivity = TaskListPagerFragment().newInstance(dateString)
                 replaceFragment(mFragmentOnActivity)
             }
             R.id.calendar_week_button -> {
+                Log.d(TAG, "onClick : clicked calendar_week_button")
                 task_add_button.visibility = View.VISIBLE
                 val currentTimeLocalDateTime = Util.getCurrentLocalDateTime()
                 val dateString = Util.toString(currentTimeLocalDateTime, FORMAT_PATTERN_DATE_ALL)
-
-//                mSelectedTaskArrayList.removeAll(mAllTaskArrayList)
-                extractTasks(currentTimeLocalDateTime)
 
                 mFragmentOnActivity = TaskCalendarFragment().newInstance(dateString)
                 replaceFragment(mFragmentOnActivity)
             }
             R.id.setting_button -> {
+                Log.d(TAG, "onClick : clicked setting_button")
                 task_add_button.visibility = View.INVISIBLE
                 today_text.text = this.resources.getString(R.string.settings_title)
                 mFragmentOnActivity = SettingsFragment().newInstance()
@@ -242,40 +243,13 @@ class MainActivity: AppCompatActivity(), View.OnClickListener, OnTaskListListene
     }
 
     /**
-     * extractTasks - Display the task with the date of the argument
-     * @param selectDate　Date to display
-     */
-    private fun extractTasks(selectDate: LocalDateTime): ArrayList<TaskEntity> {
-        Log.d(TAG, "extractTasks <start>")
-        val truncateSelectedDateToDays = selectDate.truncatedTo(ChronoUnit.DAYS)
-        val array: ArrayList<TaskEntity> = arrayListOf()
-        for (i in 0 until mAllTaskArrayList.size) {
-            val startTime = mAllTaskArrayList[i].startTime
-            val endTime = mAllTaskArrayList[i].endTime
-            if ((truncateSelectedDateToDays.isEqual(startTime.truncatedTo(ChronoUnit.DAYS))
-                        || truncateSelectedDateToDays.isAfter(startTime))
-                && (truncateSelectedDateToDays.isEqual(endTime.truncatedTo(ChronoUnit.DAYS))
-                        || truncateSelectedDateToDays.isBefore(endTime))) {
-                array.add(mAllTaskArrayList[i])
-                sortList(array)
-            }
-        }
-        Log.d(TAG, "extractTasks <end>")
-        return array
-    }
-
-    /**
      * updateList - Update the displayed list
      */
     private fun updateList() {
         Log.d(TAG, "updateList <start>")
-        if (mFragmentOnActivity is TaskListFragment) {
-            val fragment = mFragmentOnActivity as TaskListFragment
-            fragment.updateAdapter()
-//            mFragmentOnActivity = TaskListPagerFragment().newInstance("dateString", mSelectedTaskArrayList)
-        } else if (mFragmentOnActivity is TaskCalendarFragment) {
-            val fragment = mFragmentOnActivity as TaskCalendarFragment
-            fragment.updateAdapter()
+        if (mFragmentOnActivity is TaskListPagerFragment) {
+            val fragment = mFragmentOnActivity as TaskListPagerFragment
+            fragment.pagerReload()
         }
         Log.d(TAG, "updateList <end>")
     }

@@ -89,47 +89,48 @@ class TaskCreateDialogFragment: DialogFragment() {
             editPosition = args.getInt(KEY_ARGS_EDIT_POSITION, -1)
 
             taskEntity = args.getParcelable(KEY_ARGS_TASK_ENTITY) as TaskEntity?
-            if (taskEntity == null) {
-                val time = Util.getCurrentLocalDateTime()
-                taskEntity = TaskEntity(time, time, "null")
-            }
-            val startTime = taskEntity.startTime
-            val endTime = taskEntity.endTime
-            startYearEditText.setText(Util.toString(startTime, FORMAT_PATTERN_YEAR))
-            startMonthEditText.setText(Util.toString(startTime, FORMAT_PATTERN_MONTH))
-            startDayEditText.setText(Util.toString(startTime, FORMAT_PATTERN_DAY))
-
-            endYearEditText.setText(Util.toString(endTime, FORMAT_PATTERN_YEAR))
-            endMonthEditText.setText(Util.toString(endTime, FORMAT_PATTERN_MONTH))
-            endDayEditText.setText(Util.toString(endTime, FORMAT_PATTERN_DAY))
-
-            if (isEdit) {
-                startHourEditText.setText(Util.toString(startTime, FORMAT_PATTERN_HOUR))
-                startMinuitEditText.setText(Util.toString(startTime, FORMAT_PATTERN_MINUTE))
-
-                endHourEditText.setText(Util.toString(endTime, FORMAT_PATTERN_HOUR))
-                endMinuitEditText.setText(Util.toString(endTime, FORMAT_PATTERN_MINUTE))
-
-                titleEditText.setText(taskEntity.title)
-            }
-            Log.d(TAG,"onCreateDialog : startTime:${startTime}, endTime:${endTime}")
         }
+        if (taskEntity == null) {
+            val time = Util.getCurrentLocalDateTime()
+            taskEntity = TaskEntity(time, time, "null")
+        }
+        val startTime = taskEntity.startTime
+        val endTime = taskEntity.endTime
+        startYearEditText.setText(Util.toString(startTime, FORMAT_PATTERN_YEAR))
+        startMonthEditText.setText(Util.toString(startTime, FORMAT_PATTERN_MONTH))
+        startDayEditText.setText(Util.toString(startTime, FORMAT_PATTERN_DAY))
+
+        endYearEditText.setText(Util.toString(endTime, FORMAT_PATTERN_YEAR))
+        endMonthEditText.setText(Util.toString(endTime, FORMAT_PATTERN_MONTH))
+        endDayEditText.setText(Util.toString(endTime, FORMAT_PATTERN_DAY))
+
+        if (isEdit) {
+            startHourEditText.setText(Util.toString(startTime, FORMAT_PATTERN_HOUR))
+            startMinuitEditText.setText(Util.toString(startTime, FORMAT_PATTERN_MINUTE))
+
+            endHourEditText.setText(Util.toString(endTime, FORMAT_PATTERN_HOUR))
+            endMinuitEditText.setText(Util.toString(endTime, FORMAT_PATTERN_MINUTE))
+
+            titleEditText.setText(taskEntity.title)
+        }
+        Log.d(TAG,"onCreateDialog : startTime:${startTime}, endTime:${endTime}")
 
         builder.setView(dialogView)
             .setTitle("Crate Task")
             .setPositiveButton("Crate") { dialog, id ->
-                val currentTime = Util.getCurrentLocalDateTime()
+                val clickCurrentTime = Util.getCurrentLocalDateTime()
+                
                 // append task start time
                 val startYear = startYearEditText.text.toString()
                 val startMonth = startMonthEditText.text.toString()
                 val startDay = startDayEditText.text.toString()
                 var startHour = startHourEditText.text.toString()
                 if (startHour.isEmpty()) {
-                    startHour = Util.toString(currentTime, FORMAT_PATTERN_HOUR)
+                    startHour = Util.toString(clickCurrentTime, FORMAT_PATTERN_HOUR)
                 }
                 var startMinuit = startMinuitEditText.text.toString()
                 if (startMinuit.isEmpty()) {
-                    startMinuit = Util.toString(currentTime, FORMAT_PATTERN_MINUTE)
+                    startMinuit = Util.toString(clickCurrentTime, FORMAT_PATTERN_MINUTE)
                 }
                 val startLocalDateTime = try {
                     LocalDateTime.of(
@@ -165,9 +166,9 @@ class TaskCreateDialogFragment: DialogFragment() {
 
                 val endLocalDateTime = if (endHour.isEmpty()) {
                     startCalendar.add(Calendar.HOUR_OF_DAY, 1)
-                    val startTime = startCalendar.time
+                    val clickStartTime = startCalendar.time
 
-                    Util.toLocalDateTime(date = startTime)
+                    Util.toLocalDateTime(date = clickStartTime)
                 } else {
                     try {
                         LocalDateTime.of(

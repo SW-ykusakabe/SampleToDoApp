@@ -61,12 +61,7 @@ class TaskListFragment: Fragment(), AdapterView.OnItemLongClickListener {
         if (args != null) {
             val dateString = args.getString(KEY_ARGS_TASK_DATE, Util.toString(currentTime, FORMAT_PATTERN_DATE_ALL))
             mDate = Util.toLocalDateTime(dateString, FORMAT_PATTERN_DATE_ALL)
-//            val activity = activity as MainActivity
-//            Log.d(TAG, "date:$dateString")
-//            activity.setToolBarText(data)
             mSelectedTaskArrayList = mTaskListListener.getTodayList(mDate)
-            Log.d(TAG, "TaskListPageAdapter: dataSize=${mSelectedTaskArrayList.size}")
-
         } else {
             Log.d(TAG, "TaskListPageAdapter: args is null")
         }
@@ -98,11 +93,9 @@ class TaskListFragment: Fragment(), AdapterView.OnItemLongClickListener {
                 when (which) {
                     0 -> {
                         mTaskListListener.onRemoveListItem(mSelectedTaskArrayList[position], mDate)
-                        updateAdapter()
                     }
                     1 -> {
                         mTaskListListener.onEditListItem(mSelectedTaskArrayList[position], position)
-                        updateAdapter()
                     }
                 }
             }
@@ -111,17 +104,6 @@ class TaskListFragment: Fragment(), AdapterView.OnItemLongClickListener {
             .show()
         Log.d(TAG, "onItemLongClick <end>")
         return true
-    }
-
-    /**
-     * updateAdapter - Update adapter with arrayList of arguments
-     */
-    fun updateAdapter(date: LocalDateTime = mDate) {
-        Log.d(TAG, "updateAdapter <start>")
-        val array = mTaskListListener.getTodayList(date)
-        mTaskListAdapter.updateList(array, date)
-        Log.d(TAG, "updateAdapter <end>")
-
     }
 
     /**

@@ -55,11 +55,11 @@ class TaskCalendarFragment: Fragment(), CalendarView.OnDateChangeListener {
         val view = inflater.inflate(R.layout.fragment_task_calendar, container, false)
         val args = arguments
         var dateString = ""
-        var array: ArrayList<TaskEntity> = arrayListOf()
         if (args != null) {
             dateString = args.getString(KEY_ARGS_TASK_DATE, Util.toString(Util.getCurrentLocalDateTime(), FORMAT_PATTERN_DATE_ALL))
             val data = Util.toLocalDateTime(dateString, FORMAT_PATTERN_DATE_ALL)
-            array = mTaskListListener.getTodayList(data)
+            val activity = activity as MainActivity
+            activity.setToolBarText(data)
         }
         mFragment = TaskListFragment().newInstance(dateString)
         replaceFragment(mFragment)
@@ -94,15 +94,5 @@ class TaskCalendarFragment: Fragment(), CalendarView.OnDateChangeListener {
         fragmentTransaction.replace(R.id.list_container, fragment)
         fragmentTransaction.commit()
         Log.d(TAG, "replaceFragment <end>")
-    }
-
-    /**
-     * updateAdapter - Update adapter with arrayList of arguments
-     * @param array ArrayList to update
-     */
-    fun updateAdapter() {
-        Log.d(TAG, "updateAdapter <start>")
-        mFragment.updateAdapter()
-        Log.d(TAG, "updateAdapter <end>")
     }
 }
