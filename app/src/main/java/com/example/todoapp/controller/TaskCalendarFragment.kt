@@ -12,7 +12,6 @@ import androidx.fragment.app.FragmentTransaction
 import com.example.todoapp.models.OnTaskListListener
 import com.example.todoapp.R
 import com.example.todoapp.Util
-import com.example.todoapp.entitys.TaskEntity
 import java.time.LocalDateTime
 
 /**
@@ -21,7 +20,6 @@ import java.time.LocalDateTime
 class TaskCalendarFragment: Fragment(), CalendarView.OnDateChangeListener {
     companion object {
         private val TAG: String = Util.getClassName(object : Any() {}.javaClass.enclosingClass.name)
-        private const val FORMAT_PATTERN_DATE_ALL: String = "yyyy/MM/dd(e)-HH:mm"
 
         private const val KEY_ARGS_TASK_DATE: String = "ARGS_TASK_DATE"
     }
@@ -31,7 +29,7 @@ class TaskCalendarFragment: Fragment(), CalendarView.OnDateChangeListener {
 
     /**
      * newInstance - return to this instance
-     * @param array　ArrayList of tasks to display
+     * @param date　String of today date
      * @return This instance
      */
     fun newInstance(date: String): TaskCalendarFragment {
@@ -53,16 +51,6 @@ class TaskCalendarFragment: Fragment(), CalendarView.OnDateChangeListener {
         Log.d(TAG, "onCreateView <start>")
         mTaskListListener = context as OnTaskListListener
         val view = inflater.inflate(R.layout.fragment_task_calendar, container, false)
-        val args = arguments
-        var dateString = ""
-        if (args != null) {
-            dateString = args.getString(KEY_ARGS_TASK_DATE, Util.toString(Util.getCurrentLocalDateTime(), FORMAT_PATTERN_DATE_ALL))
-            val data = Util.toLocalDateTime(dateString, FORMAT_PATTERN_DATE_ALL)
-            val activity = activity as MainActivity
-            activity.setToolBarText(data)
-        }
-        mFragment = TaskListFragment().newInstance(dateString)
-        replaceFragment(mFragment)
 
         val calendarView = view.findViewById<CalendarView>(R.id.calendar_view)
         calendarView.setOnDateChangeListener(this)
@@ -78,21 +66,8 @@ class TaskCalendarFragment: Fragment(), CalendarView.OnDateChangeListener {
 //        val selectTimeLocalDateTime = LocalDateTime.of(year, month, dayOfMonth, 0, 0)
 //        mTaskListListener.getTodayList(selectTimeLocalDateTime)
 
-        mTaskListListener.onChangeListItem(year, month + 1, dayOfMonth)
-        mFragment.setSelectTime(LocalDateTime.of(year, month + 1, dayOfMonth, 0, 0))
+//        mTaskListListener.onChangeListItem(year, month + 1, dayOfMonth)
+//        mFragment.setSelectTime(LocalDateTime.of(year, month + 1, dayOfMonth, 0, 0))
         Log.d(TAG, "onSelectedDayChange <end>")
-    }
-
-    /**
-     * replaceFragment - Replace the inside of the container with an argument fragment
-     * @param fragment Fragment to display
-     */
-    private fun replaceFragment(fragment: Fragment) {
-        Log.d(TAG, "replaceFragment <start>")
-        val fragmentManager: FragmentManager = childFragmentManager
-        val fragmentTransaction: FragmentTransaction = fragmentManager.beginTransaction()
-        fragmentTransaction.replace(R.id.list_container, fragment)
-        fragmentTransaction.commit()
-        Log.d(TAG, "replaceFragment <end>")
     }
 }

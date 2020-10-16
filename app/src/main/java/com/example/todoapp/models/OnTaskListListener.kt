@@ -31,9 +31,8 @@ interface OnTaskListListener {
     /**
      * onEditListItem - Edit a task
      * @param taskEntity TaskEntity
-     * @param position Location of list to edit
      */
-    fun onEditListItem(taskEntity: TaskEntity, position: Int)
+    fun onEditListItem(taskEntity: TaskEntity)
 
     /**
      * onChangeListItem - Change the task to be displayed

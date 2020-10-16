@@ -1,9 +1,10 @@
 package com.example.todoapp.controller
 
-import android.content.Context
 import android.os.Bundle
 import android.util.Log
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.viewpager.widget.ViewPager
 import com.example.todoapp.R
@@ -12,12 +13,7 @@ import com.example.todoapp.models.TaskListPageAdapter
 import kotlinx.android.synthetic.main.fragment_pager.*
 import java.time.LocalDateTime
 
-/**
- * TaskListPagerFragment - Fragment for task list pager
- */
-class TaskListPagerFragment: Fragment(), ViewPager.OnPageChangeListener {
-//    , TaskListPageAdapter.OnCurrentItemChangeListener {
-
+class TaskCalendarPagerFragment: Fragment(), ViewPager.OnPageChangeListener {
     companion object {
         private val TAG: String = Util.getClassName(tag = object : Any() {}.javaClass.enclosingClass.name)
         private const val FORMAT_PATTERN_DATE_ALL: String = "yyyy/MM/dd(e)-HH:mm"
@@ -61,7 +57,7 @@ class TaskListPagerFragment: Fragment(), ViewPager.OnPageChangeListener {
         // setting viewPager
         val viewPager = view.findViewById<ViewPager>(R.id.view_pager)
 
-        mAdapter = TaskListPageAdapter(childFragmentManager, 0)
+//        mAdapter = TaskListPageAdapter(childFragmentManager, 0)
 
         // get data
         val args = arguments
@@ -130,18 +126,6 @@ class TaskListPagerFragment: Fragment(), ViewPager.OnPageChangeListener {
         }
         Log.d(TAG, "onPageScrollStateChanged <end>")
     }
-
-//    /** @inheritDoc */
-//    override fun getViewForPageSelected(container: ViewGroup, `object`: Any, position: Int) {
-//        Log.d(TAG, "getViewForPageSelected <start>")
-//        Log.d(TAG, "getViewForPageSelected : position=$position")
-//        if (`object` is TaskListFragment) {
-//            Log.d(TAG, "getViewForPageSelected : TaskListFragment")
-//            val activity = activity as MainActivity
-//            activity.setToolBarText(mDisplayedDate)
-//        }
-//        Log.d(TAG, "getViewForPageSelected <end>")
-//    }
 
     /**
      * pagerReload - Pager view reload

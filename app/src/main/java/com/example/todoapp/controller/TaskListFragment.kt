@@ -69,7 +69,6 @@ class TaskListFragment: Fragment(), AdapterView.OnItemLongClickListener {
         // set list view
         val listView = view.findViewById<ListView>(R.id.task_list)
         listView.onItemLongClickListener = this
-        Log.d(TAG, "mDate=$mDate")
         mTaskListAdapter = TaskListAdapter(view.context, mSelectedTaskArrayList, mDate)
         listView.adapter = mTaskListAdapter
 
@@ -95,7 +94,7 @@ class TaskListFragment: Fragment(), AdapterView.OnItemLongClickListener {
                         mTaskListListener.onRemoveListItem(mSelectedTaskArrayList[position], mDate)
                     }
                     1 -> {
-                        mTaskListListener.onEditListItem(mSelectedTaskArrayList[position], position)
+                        mTaskListListener.onEditListItem(mSelectedTaskArrayList[position])
                     }
                 }
             }

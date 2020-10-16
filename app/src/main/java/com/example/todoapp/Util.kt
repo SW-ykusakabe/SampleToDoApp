@@ -1,6 +1,5 @@
 package com.example.todoapp
 
-import android.util.Log
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -25,10 +24,7 @@ object Util {
      * @return LocalDateTime
      */
     fun getCurrentLocalDateTime(): LocalDateTime {
-        Log.d(TAG, "getCurrentLocalDateTime <start>")
-        val localDateTime = LocalDateTime.now()
-        Log.d(TAG, "getCurrentLocalDateTime <end>")
-        return localDateTime
+        return LocalDateTime.now()
     }
 
     /**
@@ -37,11 +33,8 @@ object Util {
      * @return LocalDateTime
      */
     fun toLocalDateTime(date: Date): LocalDateTime {
-        Log.d(TAG, "toLocalDateTime <start>")
         val instant = date.toInstant()
-        val ret = LocalDateTime.ofInstant(instant, ZoneId.systemDefault())
-        Log.d(TAG, "toLocalDateTime <end>")
-        return ret
+        return LocalDateTime.ofInstant(instant, ZoneId.systemDefault())
     }
 
     /**
@@ -51,11 +44,8 @@ object Util {
      * @return LocalDateTime
      */
     fun toLocalDateTime(date: String, formatStr: String): LocalDateTime {
-        Log.d(TAG, "toLocalDateTime <start>")
         val formatter = DateTimeFormatter.ofPattern(formatStr)
-        val ret = LocalDateTime.parse(date, formatter)
-        Log.d(TAG, "toLocalDateTime <end>")
-        return ret
+        return LocalDateTime.parse(date, formatter)
     }
 
     /**
@@ -65,11 +55,8 @@ object Util {
      * @return LocalDateTime String
      */
     fun toString(localDateTime: LocalDateTime, formatStr: String): String {
-        Log.d(TAG, "toString <start>")
         val formatter = DateTimeFormatter.ofPattern(formatStr)
-        val ret = localDateTime.format(formatter)
-        Log.d(TAG, "toString <end>")
-        return ret
+        return localDateTime.format(formatter)
     }
 
     /**
@@ -79,11 +66,8 @@ object Util {
      * @return Date String
      */
     fun toString(date: Date, formatStr: String): String {
-        Log.d(TAG, "toString <start>")
         val instant: Instant = date.toInstant()
         val localDateTime = LocalDateTime.ofInstant(instant, ZoneId.systemDefault())
-        val ret = toString(localDateTime, formatStr)
-        Log.d(TAG, "toString <end>")
-        return ret
+        return toString(localDateTime, formatStr)
     }
 }

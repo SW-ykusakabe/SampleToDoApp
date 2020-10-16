@@ -1,7 +1,6 @@
 package com.example.todoapp.models
 
 import android.util.Log
-import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentStatePagerAdapter
@@ -21,17 +20,19 @@ class TaskListPageAdapter(fm: FragmentManager, behavior: Int) : FragmentStatePag
         private const val SCROLL_SIZE = 6
     }
 
-    private lateinit var mListener: OnCurrentItemChangeListener
+//    private lateinit var mListener: OnCurrentItemChangeListener
+//    private var mLastActionedPrimaryItemPosition = -1
     private lateinit var mDate: LocalDateTime
-    private var mLastActionedPrimaryItemPosition = -1
 
-
-    interface OnCurrentItemChangeListener {
-        fun getViewForPageSelected(
-            container: ViewGroup, `object`: Any,
-            position: Int
-        )
-    }
+    /**
+     * OnCurrentItemChangeListener - listener
+     */
+//    interface OnCurrentItemChangeListener {
+//        fun getViewForPageSelected(
+//            container: ViewGroup, `object`: Any,
+//            position: Int
+//        )
+//    }
 
     /** @inheritDoc */
     override fun getCount(): Int {
@@ -41,35 +42,8 @@ class TaskListPageAdapter(fm: FragmentManager, behavior: Int) : FragmentStatePag
     /** @inheritDoc */
     override fun getItem(position: Int): Fragment {
         Log.d(TAG, "getItem <start>")
-        val dateStr: String = when (position) {
-            0 -> {
-                Log.d(TAG, "getItem:0, time:${mDate.minusDays(2)}")
-                Util.toString(mDate.minusDays(2), FORMAT_PATTERN_DATE_ALL)
-            }
-            1 -> {
-                Log.d(TAG, "getItem:1, time:${mDate.minusDays(1)}")
-                Util.toString(mDate.minusDays(1), FORMAT_PATTERN_DATE_ALL)
-            }
-            2 -> {
-                Log.d(TAG, "getItem:2, time:${mDate}")
-                Util.toString(mDate, FORMAT_PATTERN_DATE_ALL)
-            }
-            3 -> {
-                Log.d(TAG, "getItem:3, time:${mDate.plusDays(1)}")
-                Util.toString(mDate.plusDays(1), FORMAT_PATTERN_DATE_ALL)
-            }
-            4 -> {
-                Log.d(TAG, "getItem:4, time:${mDate.plusDays(2)}")
-                Util.toString(mDate.plusDays(2), FORMAT_PATTERN_DATE_ALL)
-            }
-            5 -> {
-                Log.d(TAG, "getItem:5, time:${mDate.plusDays(3)}")
-                Util.toString(mDate.plusDays(3), FORMAT_PATTERN_DATE_ALL)
-            }
-            else -> {
-                Util.toString(Util.getCurrentLocalDateTime(), FORMAT_PATTERN_DATE_ALL)
-            }
-        }
+        val dateStr: String = Util.toString(mDate.plusDays(position - 1L), FORMAT_PATTERN_DATE_ALL)
+        Log.d(TAG, "getItem:$position, time:${mDate.plusDays(position - 1L)}")
         Log.d(TAG, "getItem <end>")
         return TaskListFragment().newInstance(dateStr)
     }
@@ -79,18 +53,23 @@ class TaskListPageAdapter(fm: FragmentManager, behavior: Int) : FragmentStatePag
         return PagerAdapter.POSITION_NONE
     }
 
-    override fun setPrimaryItem(container: ViewGroup, position: Int, `object`: Any) {
-        Log.d(TAG, "setPrimaryItem <start>")
-        if (mLastActionedPrimaryItemPosition !== position) {
-            mListener.getViewForPageSelected(container, `object`, position)
-            mLastActionedPrimaryItemPosition = position
-        }
-        Log.d(TAG, "setPrimaryItem <end>")
-    }
+//    /** @inheritDoc */
+//    override fun setPrimaryItem(container: ViewGroup, position: Int, `object`: Any) {
+//        Log.d(TAG, "setPrimaryItem <start>")
+//        if (mLastActionedPrimaryItemPosition != position) {
+//            mListener.getViewForPageSelected(container, `object`, position)
+//            mLastActionedPrimaryItemPosition = position
+//        }
+//        Log.d(TAG, "setPrimaryItem <end>")
+//    }
 
-    fun setOnCurrentItemChangeListener(listener: OnCurrentItemChangeListener) {
-        mListener = listener
-    }
+    /**
+     * setOnCurrentItemChangeListener - Custom listener setter
+     * @param listener listener
+     */
+//    fun setOnCurrentItemChangeListener(listener: OnCurrentItemChangeListener) {
+//        mListener = listener
+//    }
 
     /**
      * initializeData
@@ -108,16 +87,17 @@ class TaskListPageAdapter(fm: FragmentManager, behavior: Int) : FragmentStatePag
      */
     fun forwardData(date: LocalDateTime) {
         Log.d(TAG, "forwardData <start>")
-        mDate = date.plusDays(1)
+        mDate = date
         Log.d(TAG, "forwardData <end>")
     }
 
     /**
      * rewindData
+     * @param date
      */
     fun rewindData(date: LocalDateTime) {
         Log.d(TAG, "rewindData <start>")
-        mDate = date.minusDays(1)
+        mDate = date.minusDays((count - 3).toLong())
         Log.d(TAG, "rewindData <end>")
     }
 }

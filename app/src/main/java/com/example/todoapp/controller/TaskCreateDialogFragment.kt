@@ -29,7 +29,6 @@ class TaskCreateDialogFragment: DialogFragment() {
         private const val FORMAT_PATTERN_MINUTE: String = "mm"
 
         private const val KEY_ARGS_EDIT: String = "ARGS_EDIT"
-        private const val KEY_ARGS_EDIT_POSITION: String = "ARGS_EDIT_POSITION"
         private const val KEY_ARGS_TASK_ENTITY: String = "KEY_ARGS_TASK_ENTITY"
     }
 
@@ -38,16 +37,14 @@ class TaskCreateDialogFragment: DialogFragment() {
     /**
      * newInstance - return to this instance
      * @param isEdit is edit?
-     * @param pos Selected list position
      * @param taskEntity taskEntity of the selected task
      * @return This instance
      */
-    fun newInstance(isEdit: Boolean, pos: Int, taskEntity: TaskEntity): TaskCreateDialogFragment {
+    fun newInstance(isEdit: Boolean, taskEntity: TaskEntity): TaskCreateDialogFragment {
         Log.d(TAG, "newInstance <start>")
         val args = Bundle()
         val fragment = TaskCreateDialogFragment()
         args.putBoolean(KEY_ARGS_EDIT, isEdit)
-        args.putInt(KEY_ARGS_EDIT_POSITION, pos)
         args.putParcelable(KEY_ARGS_TASK_ENTITY, taskEntity)
         fragment.arguments = args
         Log.d(TAG, "newInstance <end>")
@@ -80,13 +77,11 @@ class TaskCreateDialogFragment: DialogFragment() {
         val titleEditText = dialogView.findViewById<EditText>(R.id.dialog_title_text)
 
         var isEdit = false
-        var editPosition = -1
         val currentTime = Util.getCurrentLocalDateTime()
         var taskEntity: TaskEntity? = TaskEntity(currentTime, currentTime, "")
 
         if (args != null) {
             isEdit = args.getBoolean(KEY_ARGS_EDIT, false)
-            editPosition = args.getInt(KEY_ARGS_EDIT_POSITION, -1)
 
             taskEntity = args.getParcelable(KEY_ARGS_TASK_ENTITY) as TaskEntity?
         }

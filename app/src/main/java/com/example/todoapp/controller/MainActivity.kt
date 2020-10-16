@@ -7,16 +7,21 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
-import com.example.todoapp.*
-import com.example.todoapp.entitys.TaskEntity
-import com.example.todoapp.entitys.TaskDBEntity
+import com.example.todoapp.R
 import com.example.todoapp.Util
-import com.example.todoapp.models.*
+import com.example.todoapp.entitys.TaskDBEntity
+import com.example.todoapp.entitys.TaskEntity
+import com.example.todoapp.models.AppDatabase
+import com.example.todoapp.models.OnTaskListListener
+import com.example.todoapp.models.TaskDao
+import com.example.todoapp.models.TaskListComparator
 import kotlinx.android.synthetic.main.activity_main.*
+import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.LocalTime
+import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 import java.util.*
-import kotlin.collections.ArrayList
 
 /**
  * MainActivity - Activity for main
@@ -30,7 +35,8 @@ class MainActivity: AppCompatActivity(), View.OnClickListener, OnTaskListListene
     }
 
     private lateinit var mAllTaskArrayList: ArrayList<TaskEntity>
-    private lateinit var mFragmentOnActivity: Fragment
+    private lateinit var mUpperFragmentOnActivity: Fragment
+    private lateinit var mLowerFragmentOnActivity: Fragment
     private lateinit var mTaskDao: TaskDao
 
     /** @inheritDoc */
@@ -90,8 +96,8 @@ class MainActivity: AppCompatActivity(), View.OnClickListener, OnTaskListListene
 
         // create fragment
         val dataStr = Util.toString(currentTimeLocalDateTime, FORMAT_PATTERN_DATE_ALL)
-        mFragmentOnActivity = TaskListPagerFragment().newInstance(dataStr)
-        replaceFragment(mFragmentOnActivity)
+        mLowerFragmentOnActivity = TaskListPagerFragment().newInstance(dataStr)
+        replaceFragment(mLowerFragmentOnActivity)
         Log.d(TAG, "onCreate <end>")
     }
 
@@ -156,11 +162,10 @@ class MainActivity: AppCompatActivity(), View.OnClickListener, OnTaskListListene
     }
 
     /** @inheritDoc */
-    override fun onEditListItem(taskEntity: TaskEntity, position: Int) {
+    override fun onEditListItem(taskEntity: TaskEntity) {
         Log.d(TAG, "onEditListItem <start>")
         val dialog = TaskCreateDialogFragment().newInstance(
             true,
-            position,
             taskEntity
         )
         dialog.show(supportFragmentManager, "create")
@@ -178,13 +183,22 @@ class MainActivity: AppCompatActivity(), View.OnClickListener, OnTaskListListene
         Log.d(TAG, "onEditListItem <end>")
     }
 
-    @Override
+    /** @inheritDoc */
     override fun onClick(v: View) {
         Log.d(TAG, "onClick <start>")
         when (v.id) {
             R.id.task_add_button -> {
                 Log.d(TAG, "onClick : clicked task_add_button")
-                val dialog = TaskCreateDialogFragment()
+                val dateTimeFormatter = DateTimeFormatter.ofPattern(FORMAT_PATTERN_DATE_WEEK)
+                val localDateTime = LocalDate.parse(
+                    today_text.text.toString(),
+                    dateTimeFormatter
+                ).atTime(LocalTime.MIN)
+
+                val dialog = TaskCreateDialogFragment().newInstance(
+                    false,
+                    TaskEntity(localDateTime, localDateTime, "")
+                )
                 dialog.show(supportFragmentManager, "create")
             }
             R.id.calendar_day_button -> {
@@ -193,8 +207,8 @@ class MainActivity: AppCompatActivity(), View.OnClickListener, OnTaskListListene
                 val currentTimeLocalDateTime = Util.getCurrentLocalDateTime()
                 val dateString = Util.toString(currentTimeLocalDateTime, FORMAT_PATTERN_DATE_ALL)
 
-                mFragmentOnActivity = TaskListPagerFragment().newInstance(dateString)
-                replaceFragment(mFragmentOnActivity)
+                mLowerFragmentOnActivity = TaskListPagerFragment().newInstance(dateString)
+                replaceFragment(mLowerFragmentOnActivity)
             }
             R.id.calendar_week_button -> {
                 Log.d(TAG, "onClick : clicked calendar_week_button")
@@ -202,15 +216,19 @@ class MainActivity: AppCompatActivity(), View.OnClickListener, OnTaskListListene
                 val currentTimeLocalDateTime = Util.getCurrentLocalDateTime()
                 val dateString = Util.toString(currentTimeLocalDateTime, FORMAT_PATTERN_DATE_ALL)
 
-                mFragmentOnActivity = TaskCalendarFragment().newInstance(dateString)
-                replaceFragment(mFragmentOnActivity)
+                setToolBarText(date = currentTimeLocalDateTime)
+
+                mLowerFragmentOnActivity = TaskListPagerFragment().newInstance(dateString)
+                mUpperFragmentOnActivity = TaskCalendarFragment().newInstance(dateString)
+                replaceFragment(mUpperFragmentOnActivity, mLowerFragmentOnActivity)
+//                replaceFragment(mUpperFragmentOnActivity)
             }
             R.id.setting_button -> {
                 Log.d(TAG, "onClick : clicked setting_button")
                 task_add_button.visibility = View.INVISIBLE
                 today_text.text = this.resources.getString(R.string.settings_title)
-                mFragmentOnActivity = SettingsFragment().newInstance()
-                replaceFragment(mFragmentOnActivity)
+                mLowerFragmentOnActivity = SettingsFragment().newInstance()
+                replaceFragment(mLowerFragmentOnActivity)
             }
             else -> {
 
@@ -235,10 +253,29 @@ class MainActivity: AppCompatActivity(), View.OnClickListener, OnTaskListListene
      */
     private fun replaceFragment(fragment: Fragment) {
         Log.d(TAG, "replaceFragment <start>")
+        upper_container.visibility = View.GONE
         val fragmentManager: FragmentManager = supportFragmentManager
         val fragmentTransaction: FragmentTransaction = fragmentManager.beginTransaction()
-        fragmentTransaction.replace(R.id.container, fragment)
+        fragmentTransaction.replace(R.id.lower_container, fragment)
         fragmentTransaction.commit()
+        Log.d(TAG, "replaceFragment <end>")
+    }
+
+    /**
+     * replaceFragment - Replace the inside of the container with an argument fragment
+     * @param upperFragment Fragment to display
+     */
+    private fun replaceFragment(upperFragment: Fragment, lowerFragment: Fragment) {
+        Log.d(TAG, "replaceFragment <start>")
+        upper_container.visibility = View.VISIBLE
+        val fragmentManager: FragmentManager = supportFragmentManager
+        val upperFragmentTransaction: FragmentTransaction = fragmentManager.beginTransaction()
+        upperFragmentTransaction.replace(R.id.upper_container, upperFragment)
+        upperFragmentTransaction.commit()
+
+        val lowerFragmentTransaction = fragmentManager.beginTransaction()
+        lowerFragmentTransaction.replace(R.id.lower_container, lowerFragment)
+        lowerFragmentTransaction.commit()
         Log.d(TAG, "replaceFragment <end>")
     }
 
@@ -247,8 +284,8 @@ class MainActivity: AppCompatActivity(), View.OnClickListener, OnTaskListListene
      */
     private fun updateList() {
         Log.d(TAG, "updateList <start>")
-        if (mFragmentOnActivity is TaskListPagerFragment) {
-            val fragment = mFragmentOnActivity as TaskListPagerFragment
+        if (mLowerFragmentOnActivity is TaskListPagerFragment) {
+            val fragment = mLowerFragmentOnActivity as TaskListPagerFragment
             fragment.pagerReload()
         }
         Log.d(TAG, "updateList <end>")
