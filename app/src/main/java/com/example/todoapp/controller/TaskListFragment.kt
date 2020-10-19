@@ -105,13 +105,13 @@ class TaskListFragment: Fragment(), AdapterView.OnItemLongClickListener {
         return true
     }
 
-    /**
-     * setSelectTime -　Set the date of the argument to the adapter
-     * @param selectTime Selected date
-     */
-    fun setSelectTime(selectTime: LocalDateTime) {
-        Log.d(TAG, "setSelectTime <start>")
-        mTaskListAdapter.setSelectTime(selectTime)
-        Log.d(TAG, "setSelectTime <end>")
-    }
+//    /**
+//     * setSelectTime -　Set the date of the argument to the adapter
+//     * @param selectTime Selected date
+//     */
+//    fun setSelectTime(selectTime: LocalDateTime) {
+//        Log.d(TAG, "setSelectTime <start>")
+//        mTaskListAdapter.setSelectTime(selectTime)
+//        Log.d(TAG, "setSelectTime <end>")
+//    }
 }

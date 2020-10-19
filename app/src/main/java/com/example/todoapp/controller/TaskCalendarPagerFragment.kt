@@ -27,7 +27,7 @@ class TaskCalendarPagerFragment: Fragment(), ViewPager.OnPageChangeListener {
     private lateinit var mDisplayedDate: LocalDateTime
     private var mPosition = -1
     private var mScrollSize = -1
-    private var jumpPosition = -1;
+    private var jumpPosition = -1
 
     /**
      * newInstance - return to this instance
@@ -106,7 +106,7 @@ class TaskCalendarPagerFragment: Fragment(), ViewPager.OnPageChangeListener {
             jumpPosition = mScrollSize - 2
             mAdapter.rewindData(mDisplayedDate)
         } else if (position == mScrollSize - 1) {
-            jumpPosition = 1;
+            jumpPosition = 1
             mAdapter.forwardData(mDisplayedDate)
         }
         Log.d(TAG, "onPageSelected <end>")
@@ -121,18 +121,9 @@ class TaskCalendarPagerFragment: Fragment(), ViewPager.OnPageChangeListener {
         Log.d(TAG, "onPageScrollStateChanged <start>")
         Log.d(TAG, "onPageScrollStateChanged : state:$state")
         if (state == ViewPager.SCROLL_STATE_IDLE && jumpPosition >= 0) {
-            view_pager.setCurrentItem(jumpPosition, false);
-            jumpPosition = -1;
+            view_pager.setCurrentItem(jumpPosition, false)
+            jumpPosition = -1
         }
         Log.d(TAG, "onPageScrollStateChanged <end>")
-    }
-
-    /**
-     * pagerReload - Pager view reload
-     */
-    fun pagerReload() {
-        Log.d(TAG, "pagerReload <start>")
-        mAdapter.notifyDataSetChanged()
-        Log.d(TAG, "pagerReload <end>")
     }
 }

@@ -35,10 +35,14 @@ interface OnTaskListListener {
     fun onEditListItem(taskEntity: TaskEntity)
 
     /**
-     * onChangeListItem - Change the task to be displayed
-     * @param year Year to change
-     * @param month　Month to change
-     * @param dayOfWeek DayOfWeek to change
+     * onChangeListItem - Change display list by selection
+     * @param date date to change
      */
-    fun onChangeListItem(year: Int, month: Int, dayOfWeek: Int)
+    fun onSelectListToChange(date: LocalDateTime)
+
+    /**
+     * onChangeListItem - Change the display list by scrolling
+     * @param date date to change
+     */
+    fun onScrollListToChange(date: LocalDateTime)
 }

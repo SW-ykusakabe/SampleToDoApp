@@ -28,19 +28,20 @@ class TaskListAdapter(context: Context,
 
     private val layoutInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
 
-    /** @inheritDoc  */
+    /** @inheritDoc */
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
         Log.d(TAG, "getView <start>")
         var view = convertView
         if (convertView == null) {
-            view = layoutInflater.inflate(R.layout.task_list_item, parent, false)
+            view = layoutInflater.inflate(R.layout.item_task_list, parent, false)
         }
         if (mTaskList.size > position) {
             val task = mTaskList[position]
 
             Log.d(TAG, "getView : mDate=$mDate")
             val selectDay = mDate.truncatedTo(ChronoUnit.DAYS)
-            // start
+
+            // set start time
             val startTime = view?.findViewById<TextView>(R.id.start_time_text)
             if (selectDay.isEqual(task.startTime.truncatedTo(ChronoUnit.DAYS))) {
                 startTime?.text = Util.toString(task.startTime, FORMAT_PATTERN_TIME)
@@ -49,7 +50,7 @@ class TaskListAdapter(context: Context,
                 startTime?.visibility = View.GONE
             }
 
-            // end
+            // set end time
             val endTime = view?.findViewById<TextView>(R.id.end_time_text)
             if (selectDay.isEqual(task.endTime.truncatedTo(ChronoUnit.DAYS))) {
                 endTime?.text = Util.toString(task.endTime, FORMAT_PATTERN_TIME)
@@ -58,25 +59,12 @@ class TaskListAdapter(context: Context,
                 endTime?.visibility = View.GONE
             }
 
-            // title
+            // set title
             val title = view?.findViewById<TextView>(R.id.title_list_item_text)
             title?.text = task.title
         }
         Log.d(TAG, "getView <end>")
         return view!!
-    }
-
-    /**
-     * updateList - Update the displayed list
-     * @param taskList ArrayList you want to update
-     */
-    fun updateList(taskList: ArrayList<TaskEntity>, selectTime: LocalDateTime) {
-        Log.d(TAG, "updateList <start>")
-        mDate = selectTime
-        mTaskList = taskList
-        // 再描画
-        notifyDataSetChanged()
-        Log.d(TAG, "updateList <end>")
     }
 
     /**

@@ -28,7 +28,7 @@
             android:src="@drawable/ic_arrow"
             android:scaleType="fitXY"
             tools:ignore="NestedWeights"
-            android:contentDescription="@string/arrow_under" />
+            android:contentDescription="@string/arrow_for_under" />
 
         <TextView
             android:id="@+id/end_time_text"

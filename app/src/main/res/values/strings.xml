@@ -1,23 +1,38 @@
 <resources>
+<!--  app title  -->
     <string name="app_name">ToDoApp</string>
 
+<!--  activity  -->
     <string name="pulse">+</string>
 
-    <string name="time_dummy_hint">00 : 00</string>
-    <string name="arrow_under">↓</string>
+<!--  list fragment  -->
+    <string name="dummy_hint_for_time">hh : mm</string>
+    <string name="arrow_for_under">↓</string>
     <string name="dummy_hint">dummy</string>
 
+<!--  calendar fragment  -->
+    <string name="day_of_the_week_for_sunday">日</string>
+    <string name="day_of_the_week_for_monday">月</string>
+    <string name="day_of_the_week_for_tuesday">火</string>
+    <string name="day_of_the_week_for_wednesday">水</string>
+    <string name="day_of_the_week_for_thursday">木</string>
+    <string name="day_of_the_week_for_friday">金</string>
+    <string name="day_of_the_week_for_saturday">土</string>
+    <string name="dummy_string_for_year_month">YYYY.m</string>
+    <string name="arrow_for_last">&lt;&lt;</string>
+    <string name="arrow_for_next">&gt;&gt;</string>
+
+<!--  dialog fragment  -->
     <string name="start_task_text">開始年月日</string>
     <string name="end_task_text">終了年月日</string>
-
     <string name="year">年</string>
     <string name="month">月</string>
     <string name="day">日</string>
     <string name="hour">時</string>
     <string name="minuit">分</string>
-    <string name="time_hint">time</string>
     <string name="title_hint">title</string>
 
+<!--  setting fragment  -->
     <string name="settings_title">Settings</string>
 
 </resources>

@@ -173,14 +173,22 @@ class MainActivity: AppCompatActivity(), View.OnClickListener, OnTaskListListene
     }
 
     /** @inheritDoc */
-    override fun onChangeListItem(year: Int, month: Int, dayOfWeek: Int) {
-        Log.d(TAG, "onEditListItem <start>")
-        Log.d(TAG, "onChangeListItem : year:$year, month:$month, dayOfWeek:$dayOfWeek")
+    override fun onSelectListToChange(date: LocalDateTime) {
+        Log.d(TAG, "onSelectListToChange <start>")
+        setToolBarText(date)
+        if (mLowerFragmentOnActivity is TaskListPagerFragment) {
+            (mLowerFragmentOnActivity as TaskListPagerFragment).pagerReload(date)
+        }
+        Log.d(TAG, "onSelectListToChange <end>")
+    }
 
-        val selectTimeLocalDateTime = LocalDateTime.of(year, month, dayOfWeek, 0, 0)
-        setToolBarText(selectTimeLocalDateTime)
-
-        Log.d(TAG, "onEditListItem <end>")
+    /** @inheritDoc */
+    override fun onScrollListToChange(date: LocalDateTime) {
+        Log.d(TAG, "onScrollListToChange <start>")
+        if (mUpperFragmentOnActivity is TaskCalendarFragment) {
+            (mUpperFragmentOnActivity as TaskCalendarFragment).listScrolled(date)
+        }
+        Log.d(TAG, "onScrollListToChange <end>")
     }
 
     /** @inheritDoc */
