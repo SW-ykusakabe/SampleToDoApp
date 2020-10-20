@@ -60,7 +60,7 @@ class TaskCreateDialogFragment: DialogFragment() {
 
         val builder = AlertDialog.Builder(activity)
         val inflater = activity!!.layoutInflater
-        val dialogView = inflater.inflate(R.layout.add_task_dialog_item, null)
+        val dialogView = inflater.inflate(R.layout.time_add_task_dialog, null)
 
         val startYearEditText = dialogView.findViewById<EditText>(R.id.start_year_edit_text)
         val startMonthEditText = dialogView.findViewById<EditText>(R.id.start_month_edit_text)
@@ -208,5 +208,4 @@ class TaskCreateDialogFragment: DialogFragment() {
             .show()
         Log.d(TAG, "simpleDialog <end>")
     }
-
 }

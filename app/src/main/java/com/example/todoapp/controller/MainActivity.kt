@@ -227,9 +227,10 @@ class MainActivity: AppCompatActivity(), View.OnClickListener, OnTaskListListene
                 setToolBarText(date = currentTimeLocalDateTime)
 
                 mLowerFragmentOnActivity = TaskListPagerFragment().newInstance(dateString)
-                mUpperFragmentOnActivity = TaskCalendarFragment().newInstance(dateString)
-                replaceFragment(mUpperFragmentOnActivity, mLowerFragmentOnActivity)
+//                mUpperFragmentOnActivity = TaskCalendarFragment().newInstance(dateString)
+                mUpperFragmentOnActivity = TaskCalendarPagerFragment().newInstance(dateString)
 //                replaceFragment(mUpperFragmentOnActivity)
+                replaceFragment(mUpperFragmentOnActivity, mLowerFragmentOnActivity)
             }
             R.id.setting_button -> {
                 Log.d(TAG, "onClick : clicked setting_button")

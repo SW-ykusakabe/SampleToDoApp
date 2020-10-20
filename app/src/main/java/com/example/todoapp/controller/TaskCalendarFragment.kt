@@ -101,6 +101,5 @@ class TaskCalendarFragment: Fragment(), View.OnClickListener, AdapterView.OnItem
         Log.d(TAG, "listScrolled <start>")
 
         Log.d(TAG, "listScrolled <end>")
-
     }
 }
