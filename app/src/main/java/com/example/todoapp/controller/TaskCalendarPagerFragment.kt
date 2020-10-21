@@ -15,7 +15,8 @@ import java.time.LocalDateTime
 
 class TaskCalendarPagerFragment: Fragment(), ViewPager.OnPageChangeListener {
     companion object {
-        private val TAG: String = Util.getClassName(tag = object : Any() {}.javaClass.enclosingClass.name)
+        private val TAG: String = Util.getClassName(tag = object :
+            Any() {}.javaClass.enclosingClass.name)
         private const val FORMAT_PATTERN_DATE_ALL: String = "yyyy/MM/dd(e)-HH:mm"
 
         private const val KEY_ARGS_TASK_DATE: String = "ARGS_TASK_DATE"
@@ -48,7 +49,7 @@ class TaskCalendarPagerFragment: Fragment(), ViewPager.OnPageChangeListener {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View? {
         Log.d(TAG, "onCreateView <start>")
         mListener = this
@@ -62,13 +63,12 @@ class TaskCalendarPagerFragment: Fragment(), ViewPager.OnPageChangeListener {
         // get data
         val args = arguments
         if (args != null) {
-            val dateString = args.getString(KEY_ARGS_TASK_DATE, Util.toString(Util.getCurrentLocalDateTime(), FORMAT_PATTERN_DATE_ALL))
+            val dateString = args.getString(KEY_ARGS_TASK_DATE, Util.getCurrentTimeOfString(
+                FORMAT_PATTERN_DATE_ALL))
             val data = Util.toLocalDateTime(dateString, FORMAT_PATTERN_DATE_ALL)
             mAdapter.initializeData(data)
 //            mAdapter.setOnCurrentItemChangeListener(this)
             mDisplayedDate = data
-            val activity = activity as MainActivity
-            activity.setToolBarText(mDisplayedDate)
         }
 
         mScrollSize = mAdapter.count
@@ -87,27 +87,8 @@ class TaskCalendarPagerFragment: Fragment(), ViewPager.OnPageChangeListener {
         Log.d(TAG, "onPageSelected <start>")
         Log.d(TAG, "onPageSelected : position:$position")
 
-        // display date
-        val activity = activity as MainActivity
-        if(position - mPosition == 1) {
-            mDisplayedDate = mDisplayedDate.plusDays(1)
-        } else if(position - mPosition == -1) {
-            mDisplayedDate = mDisplayedDate.minusDays(1)
-        }
-        activity.setToolBarText(mDisplayedDate)
-        mPosition = position
-
         // scroll jump
-        if (mScrollSize == -1) {
-            mScrollSize = mAdapter.count
-        }
-        if (position == 0) {
-            jumpPosition = mScrollSize - 2
-            mAdapter.rewindData(mDisplayedDate)
-        } else if (position == mScrollSize - 1) {
-            jumpPosition = 1
-            mAdapter.forwardData(mDisplayedDate)
-        }
+        scrollJump(position)
         Log.d(TAG, "onPageSelected <end>")
     }
 
@@ -124,5 +105,46 @@ class TaskCalendarPagerFragment: Fragment(), ViewPager.OnPageChangeListener {
             jumpPosition = -1
         }
         Log.d(TAG, "onPageScrollStateChanged <end>")
+    }
+
+    /**
+     * scrollJump
+     * @param position
+     */
+    private fun scrollJump(position: Int) {
+        Log.d(TAG, "scrollJump <start>")
+        if (mScrollSize == -1) {
+            mScrollSize = mAdapter.count
+        }
+        if (position == 0) {
+            jumpPosition = mScrollSize - 2
+            mAdapter.rewindData(mDisplayedDate)
+        } else if (position == mScrollSize - 1) {
+            jumpPosition = 1
+            mAdapter.forwardData(mDisplayedDate)
+        }
+        Log.d(TAG, "scrollJump <ndd>")
+    }
+
+    /**
+     * lastMonth
+     */
+    fun lastMonth() {
+        Log.d(TAG, "lastMonth <start>")
+        val currPos: Int = view_pager.currentItem
+        view_pager.setCurrentItem(currPos - 1, false)
+        scrollJump(currPos)
+        Log.d(TAG, "lastMonth <end>")
+    }
+
+    /**
+     * nextMonth
+     */
+    fun nextMonth() {
+        Log.d(TAG, "nextMonth <start>")
+        val currPos: Int = view_pager.currentItem
+        view_pager.setCurrentItem(currPos + 1, false)
+        scrollJump(currPos)
+        Log.d(TAG, "nextMonth <end>")
     }
 }

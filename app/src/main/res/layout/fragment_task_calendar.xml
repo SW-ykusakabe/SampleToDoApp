@@ -106,12 +106,9 @@
     </LinearLayout>
 
 <!--  day  -->
-    <GridView
-        android:id="@+id/calendar_grid_view"
+    <FrameLayout
+        android:id="@+id/day_container"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:numColumns="7"
-        android:stretchMode="columnWidth"
-        android:verticalSpacing="1dp"/>
+        android:layout_height="wrap_content"/>
 
 </LinearLayout>

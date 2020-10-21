@@ -6,12 +6,11 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.EditText
 import androidx.fragment.app.DialogFragment
-import com.example.todoapp.models.OnTaskListListener
 import com.example.todoapp.R
-import com.example.todoapp.entitys.TaskEntity
 import com.example.todoapp.Util
-import java.time.DateTimeException
-import java.time.LocalDateTime
+import com.example.todoapp.entitys.TaskEntity
+import com.example.todoapp.models.OnTaskListListener
+import java.time.*
 import java.util.*
 import kotlin.Any as KotlinAny
 
@@ -20,7 +19,8 @@ import kotlin.Any as KotlinAny
  */
 class TaskCreateDialogFragment: DialogFragment() {
     companion object {
-        private val TAG: String = Util.getClassName(object : KotlinAny() {}.javaClass.enclosingClass.name)
+        private val TAG: String = Util.getClassName(object :
+            KotlinAny() {}.javaClass.enclosingClass.name)
 
         private const val FORMAT_PATTERN_YEAR: String = "yyyy"
         private const val FORMAT_PATTERN_MONTH: String = "MM"
@@ -108,7 +108,7 @@ class TaskCreateDialogFragment: DialogFragment() {
 
             titleEditText.setText(taskEntity.title)
         }
-        Log.d(TAG,"onCreateDialog : startTime:${startTime}, endTime:${endTime}")
+        Log.d(TAG, "onCreateDialog : startTime:${startTime}, endTime:${endTime}")
 
         builder.setView(dialogView)
             .setTitle("Crate Task")
@@ -141,13 +141,7 @@ class TaskCreateDialogFragment: DialogFragment() {
                     return@setPositiveButton
                 }
                 val startCalendar = Calendar.getInstance()
-                startCalendar.set(
-                    startYear.toInt(),
-                    startMonth.toInt() - 1,
-                    startDay.toInt(),
-                    startHour.toInt(),
-                    startMinuit.toInt()
-                )
+                startCalendar.time = Util.toDate(startLocalDateTime)
 
                 // append task end time
                 val endYear = endYearEditText.text.toString()

@@ -7,26 +7,23 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.fragment.app.Fragment
-import com.example.todoapp.models.OnTaskListListener
+import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.FragmentTransaction
 import com.example.todoapp.R
 import com.example.todoapp.Util
-import com.example.todoapp.models.CalendarAdapter
-import kotlinx.android.synthetic.main.fragment_task_calendar.*
-import java.time.LocalDateTime
 
 /**
  * TaskCalendarFragment -  Fragment for task calendar
  */
-class TaskCalendarFragment: Fragment(), View.OnClickListener, AdapterView.OnItemClickListener{
+class TaskCalendarFragment: Fragment(), View.OnClickListener {
     companion object {
         private val TAG: String = Util.getClassName(object : Any() {}.javaClass.enclosingClass.name)
+        private const val FORMAT_PATTERN_DATE_ALL: String = "yyyy/MM/dd(e)-HH:mm"
 
         private const val KEY_ARGS_TASK_DATE: String = "ARGS_TASK_DATE"
     }
 
-    private lateinit var mTaskListListener: OnTaskListListener
-    private lateinit var mCalendarAdapter: CalendarAdapter
-
+    private lateinit var mFragment: TaskCalendarPagerFragment
     /**
      * newInstance - return to this instance
      * @param date　String of today date
@@ -49,20 +46,23 @@ class TaskCalendarFragment: Fragment(), View.OnClickListener, AdapterView.OnItem
         savedInstanceState: Bundle?
     ): View? {
         Log.d(TAG, "onCreateView <start>")
-        mTaskListListener = context as OnTaskListListener
         val view = inflater.inflate(R.layout.fragment_task_calendar, container, false)
 
-        val calendarGridView = view.findViewById<GridView>(R.id.calendar_grid_view)
-        mCalendarAdapter = CalendarAdapter(view.context)
-        calendarGridView.adapter = mCalendarAdapter
-        val titleText = view.findViewById<TextView>(R.id.title_text)
-        titleText.text = mCalendarAdapter.title
+        val args = arguments
+        val dateString = args?.getString(KEY_ARGS_TASK_DATE, Util.getCurrentTimeOfString(FORMAT_PATTERN_DATE_ALL))
+        val data = Util.toLocalDateTime(dateString!!, FORMAT_PATTERN_DATE_ALL)
 
-        calendarGridView.onItemClickListener = this
+        val titleText = view.findViewById<TextView>(R.id.title_text)
+        titleText.text = Util.toString(data, "yyyy/MM")
+
         val lastButton = view.findViewById<Button>(R.id.last_button)
-        lastButton.setOnClickListener(this)
         val nextButton = view.findViewById<Button>(R.id.next_button)
+
+        lastButton.setOnClickListener(this)
         nextButton.setOnClickListener(this)
+
+        mFragment = TaskCalendarPagerFragment().newInstance(dateString)
+        replaceFragment(mFragment)
 
         Log.d(TAG, "onCreateView <end>")
         return view
@@ -74,32 +74,26 @@ class TaskCalendarFragment: Fragment(), View.OnClickListener, AdapterView.OnItem
         when(v.id) {
             R.id.last_button -> {
                 Log.d(TAG, "onClick : last_button")
-                mCalendarAdapter.lastMonth()
-                title_text.text = mCalendarAdapter.title
+                mFragment.lastMonth()
             }
             R.id.next_button -> {
                 Log.d(TAG, "onClick : next_button")
-                mCalendarAdapter.nextMonth()
-                title_text.text = mCalendarAdapter.title
+                mFragment.nextMonth()
             }
         }
         Log.d(TAG, "onClick <end>")
     }
 
-    /** @inheritDoc */
-    override fun onItemClick(parent: AdapterView<*>?, view: View, position: Int, id: Long) {
-        Log.d(TAG, "onItemClick <start>")
-        Log.d(TAG, "onItemClick : position=$position")
-        mCalendarAdapter.changeColor(view, position)
-
-        val date = Util.toLocalDateTime(mCalendarAdapter.date(position))
-        mTaskListListener.onSelectListToChange(date = date)
-        Log.d(TAG, "onItemClick <end>")
-    }
-
-    fun listScrolled(date: LocalDateTime) {
-        Log.d(TAG, "listScrolled <start>")
-
-        Log.d(TAG, "listScrolled <end>")
+    /**
+     * replaceFragment - Replace the inside of the container with an argument fragment
+     * @param fragment Fragment to display
+     */
+    private fun replaceFragment(fragment: Fragment) {
+        Log.d(TAG, "replaceFragment <start>")
+        val fragmentManager: FragmentManager = childFragmentManager
+        val fragmentTransaction: FragmentTransaction = fragmentManager.beginTransaction()
+        fragmentTransaction.replace(R.id.day_container, fragment)
+        fragmentTransaction.commit()
+        Log.d(TAG, "replaceFragment <end>")
     }
 }

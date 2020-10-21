@@ -6,7 +6,7 @@ import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentStatePagerAdapter
 import androidx.viewpager.widget.PagerAdapter
 import com.example.todoapp.Util
-import com.example.todoapp.controller.TaskCalendarFragment
+import com.example.todoapp.controller.TaskCalendarDateFragment
 import java.time.LocalDateTime
 
 /**
@@ -30,10 +30,10 @@ class CalendarPageAdapter(fm: FragmentManager, behavior: Int) : FragmentStatePag
     /** @inheritDoc */
     override fun getItem(position: Int): Fragment {
         Log.d(TAG, "getItem <start>")
-        val dateStr: String = Util.toString(mDate.plusDays(position - 1L), FORMAT_PATTERN_DATE_ALL)
-        Log.d(TAG, "getItem:$position, time:${mDate.plusDays(position - 1L)}")
+        val dateStr: String = Util.toString(mDate.plusMonths(position - 1L), FORMAT_PATTERN_DATE_ALL)
+        Log.d(TAG, "getItem:$position, time:${mDate.plusMonths(position - 1L)}")
         Log.d(TAG, "getItem <end>")
-        return TaskCalendarFragment().newInstance(dateStr)
+        return TaskCalendarDateFragment().newInstance(dateStr)
     }
 
     /** @inheritDoc */

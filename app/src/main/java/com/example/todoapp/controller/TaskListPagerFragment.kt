@@ -65,7 +65,7 @@ class TaskListPagerFragment: Fragment(), ViewPager.OnPageChangeListener {
         // get data
         val args = arguments
         if (args != null) {
-            val dateString = args.getString(KEY_ARGS_TASK_DATE, Util.toString(Util.getCurrentLocalDateTime(), FORMAT_PATTERN_DATE_ALL))
+            val dateString = args.getString(KEY_ARGS_TASK_DATE, Util.getCurrentTimeOfString(FORMAT_PATTERN_DATE_ALL))
             val date = Util.toLocalDateTime(dateString, FORMAT_PATTERN_DATE_ALL)
             mAdapter.initializeData(date)
 //            mAdapter.setOnCurrentItemChangeListener(this)

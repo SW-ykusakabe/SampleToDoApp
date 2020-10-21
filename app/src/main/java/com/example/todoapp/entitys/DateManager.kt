@@ -3,27 +3,27 @@ package com.example.todoapp.entitys
 import android.util.Log
 import com.example.todoapp.Util
 import java.text.SimpleDateFormat
+import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
 import java.util.ArrayList
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
-class DateManager {
+class DateManager(localDateTime: LocalDateTime) {
     companion object {
         private val TAG: String = Util.getClassName(object : Any() {}.javaClass.enclosingClass.name)
     }
-    var mCalendar: Calendar = Calendar.getInstance()
 
-    val weeks: Int
-        get() = mCalendar.getActualMaximum(Calendar.WEEK_OF_MONTH)
+    private var mCalendar: Calendar
+    private val mWeeks: Int = 6
 
     val days: List<Date>
         get() {
             Log.d(TAG, "getDays <start>")
             val startDate: Date = mCalendar.time
 
-            val count = weeks * 7
+            val count = mWeeks * 7
 
             mCalendar.set(Calendar.DATE, 1)
             val dayOfWeek: Int = mCalendar.get(Calendar.DAY_OF_WEEK) - 1
@@ -39,6 +39,18 @@ class DateManager {
             return days
         }
 
+    init {
+        Log.d(TAG, "init <start>")
+        mCalendar = Calendar.getInstance()
+        mCalendar.time = Util.toDate(localDateTime)
+        Log.d(TAG, "init <end>")
+    }
+
+    /**
+     * isCurrentMonth
+     * @param date
+     * @return Boolean
+     */
     fun isCurrentMonth(date: Date): Boolean {
         Log.d(TAG, "isCurrentMonth <start>")
         val format = SimpleDateFormat("yyyy.MM", Locale.JAPAN)
@@ -47,6 +59,11 @@ class DateManager {
         return currentMonth == format.format(date)
     }
 
+    /**
+     * isCurrentDay
+     * @param date
+     * @return Boolean
+     */
     fun isCurrentDay(date: Date): Boolean {
         Log.d(TAG, "isCurrentDay <start>")
         val currentTime = Util.getCurrentLocalDateTime().truncatedTo(ChronoUnit.DAYS)
@@ -55,6 +72,11 @@ class DateManager {
         return currentTime == selectTime
     }
 
+    /**
+     * getDayOfWeek
+     * @param date
+     * @return getDayOfWeek
+     */
     fun getDayOfWeek(date: Date): Int {
         Log.d(TAG, "getDayOfWeek <start>")
         val calendar: Calendar = Calendar.getInstance()

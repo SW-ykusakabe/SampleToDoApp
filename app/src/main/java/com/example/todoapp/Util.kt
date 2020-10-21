@@ -3,6 +3,7 @@ package com.example.todoapp
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
+import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
 
@@ -46,6 +47,28 @@ object Util {
     fun toLocalDateTime(date: String, formatStr: String): LocalDateTime {
         val formatter = DateTimeFormatter.ofPattern(formatStr)
         return LocalDateTime.parse(date, formatter)
+    }
+
+    /**
+     * toDate
+     * @param localDateTime
+     * @return date
+     */
+    fun toDate(localDateTime: LocalDateTime): Date {
+        val zone: ZoneId = ZoneId.systemDefault()
+        val zonedDateTime: ZonedDateTime = ZonedDateTime.of(localDateTime, zone)
+
+        val instant: Instant = zonedDateTime.toInstant()
+        return Date.from(instant)
+    }
+
+    /**
+     * getCurrentTimeOfString
+     * @param formatStr format
+     * @return String
+     */
+    fun getCurrentTimeOfString(formatStr: String): String {
+        return toString(getCurrentLocalDateTime(), formatStr)
     }
 
     /**

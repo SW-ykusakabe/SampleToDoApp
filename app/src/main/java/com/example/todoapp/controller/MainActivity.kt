@@ -185,9 +185,9 @@ class MainActivity: AppCompatActivity(), View.OnClickListener, OnTaskListListene
     /** @inheritDoc */
     override fun onScrollListToChange(date: LocalDateTime) {
         Log.d(TAG, "onScrollListToChange <start>")
-        if (mUpperFragmentOnActivity is TaskCalendarFragment) {
-            (mUpperFragmentOnActivity as TaskCalendarFragment).listScrolled(date)
-        }
+//        if (mUpperFragmentOnActivity is TaskCalendarFragment) {
+//            (mUpperFragmentOnActivity as TaskCalendarFragment).listScrolled(date)
+//        }
         Log.d(TAG, "onScrollListToChange <end>")
     }
 
@@ -227,8 +227,8 @@ class MainActivity: AppCompatActivity(), View.OnClickListener, OnTaskListListene
                 setToolBarText(date = currentTimeLocalDateTime)
 
                 mLowerFragmentOnActivity = TaskListPagerFragment().newInstance(dateString)
-//                mUpperFragmentOnActivity = TaskCalendarFragment().newInstance(dateString)
-                mUpperFragmentOnActivity = TaskCalendarPagerFragment().newInstance(dateString)
+                mUpperFragmentOnActivity = TaskCalendarFragment().newInstance(dateString)
+//                mUpperFragmentOnActivity = TaskCalendarPagerFragment().newInstance(dateString)
 //                replaceFragment(mUpperFragmentOnActivity)
                 replaceFragment(mUpperFragmentOnActivity, mLowerFragmentOnActivity)
             }
