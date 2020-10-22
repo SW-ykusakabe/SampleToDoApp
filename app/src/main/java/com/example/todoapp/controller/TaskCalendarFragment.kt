@@ -84,6 +84,14 @@ class TaskCalendarFragment: Fragment(), View.OnClickListener {
         Log.d(TAG, "onClick <end>")
     }
 
+    fun dayChange(count: Int) {
+        if (count > 0) {
+            mFragment.lastDay()
+        } else {
+            mFragment.nextDay()
+        }
+    }
+
     /**
      * replaceFragment - Replace the inside of the container with an argument fragment
      * @param fragment Fragment to display

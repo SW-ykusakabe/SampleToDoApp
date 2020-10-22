@@ -15,7 +15,6 @@ import java.time.LocalDateTime
  * TaskListPagerFragment - Fragment for task list pager
  */
 class TaskListPagerFragment: Fragment(), ViewPager.OnPageChangeListener {
-//    , TaskListPageAdapter.OnCurrentItemChangeListener {
 
     companion object {
         private val TAG: String = Util.getClassName(tag = object : Any() {}.javaClass.enclosingClass.name)
@@ -68,7 +67,6 @@ class TaskListPagerFragment: Fragment(), ViewPager.OnPageChangeListener {
             val dateString = args.getString(KEY_ARGS_TASK_DATE, Util.getCurrentTimeOfString(FORMAT_PATTERN_DATE_ALL))
             val date = Util.toLocalDateTime(dateString, FORMAT_PATTERN_DATE_ALL)
             mAdapter.initializeData(date)
-//            mAdapter.setOnCurrentItemChangeListener(this)
             mDisplayedDate = date
             val activity = activity as MainActivity
             activity.setToolBarText(mDisplayedDate)
@@ -93,12 +91,14 @@ class TaskListPagerFragment: Fragment(), ViewPager.OnPageChangeListener {
 
         // display date
         val activity = activity as MainActivity
-        if(position - mPosition == 1) {
+        val count = position - mPosition
+        if(count == 1) {
             mDisplayedDate = mDisplayedDate.plusDays(1)
-        } else if(position - mPosition == -1) {
+        } else if(count == -1) {
             mDisplayedDate = mDisplayedDate.minusDays(1)
         }
         activity.setToolBarText(mDisplayedDate)
+        activity.sendDayChanged(count)
         mPosition = position
 
         // scroll jump
@@ -130,18 +130,6 @@ class TaskListPagerFragment: Fragment(), ViewPager.OnPageChangeListener {
         Log.d(TAG, "onPageScrollStateChanged <end>")
     }
 
-//    /** @inheritDoc */
-//    override fun getViewForPageSelected(container: ViewGroup, `object`: Any, position: Int) {
-//        Log.d(TAG, "getViewForPageSelected <start>")
-//        Log.d(TAG, "getViewForPageSelected : position=$position")
-//        if (`object` is TaskListFragment) {
-//            Log.d(TAG, "getViewForPageSelected : TaskListFragment")
-//            val activity = activity as MainActivity
-//            activity.setToolBarText(mDisplayedDate)
-//        }
-//        Log.d(TAG, "getViewForPageSelected <end>")
-//    }
-
     /**
      * pagerReload - Pager view reload
      */
@@ -151,6 +139,10 @@ class TaskListPagerFragment: Fragment(), ViewPager.OnPageChangeListener {
         Log.d(TAG, "pagerReload <end>")
     }
 
+    /**
+     * pagerReload - Pager view reload
+     * @param date
+     */
     fun pagerReload(date: LocalDateTime) {
         Log.d(TAG, "pagerReload <start>")
         mAdapter.initializeData(date)

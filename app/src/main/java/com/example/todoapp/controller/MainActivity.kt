@@ -27,6 +27,7 @@ import java.util.*
  * MainActivity - Activity for main
  */
 class MainActivity: AppCompatActivity(), View.OnClickListener, OnTaskListListener {
+    //region member variable
     companion object {
         private val TAG: String = Util.getClassName(object : Any() {}.javaClass.enclosingClass.name)
 
@@ -38,7 +39,9 @@ class MainActivity: AppCompatActivity(), View.OnClickListener, OnTaskListListene
     private lateinit var mUpperFragmentOnActivity: Fragment
     private lateinit var mLowerFragmentOnActivity: Fragment
     private lateinit var mTaskDao: TaskDao
+    //endregion
 
+    //region override
     /** @inheritDoc */
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.d(TAG, "onCreate <start>")
@@ -245,7 +248,9 @@ class MainActivity: AppCompatActivity(), View.OnClickListener, OnTaskListListene
         }
         Log.d(TAG, "onClick <end>")
     }
+    //endregion
 
+    //region public method
     /**
      * setToolBarText - Set date on toolbar
      * @param date LocalDateTime to set
@@ -256,6 +261,14 @@ class MainActivity: AppCompatActivity(), View.OnClickListener, OnTaskListListene
         Log.d(TAG, "setToolBarText <end>")
     }
 
+    fun sendDayChanged(count: Int) {
+        if (mUpperFragmentOnActivity is TaskCalendarFragment) {
+            (mUpperFragmentOnActivity as TaskCalendarFragment).dayChange(count)
+        }
+    }
+    //endregion
+
+    //region private method
     /**
      * replaceFragment - Replace the inside of the container with an argument fragment
      * @param fragment Fragment to display
@@ -309,4 +322,5 @@ class MainActivity: AppCompatActivity(), View.OnClickListener, OnTaskListListene
         Collections.sort(array, TaskListComparator())
         Log.d(TAG, "sortList <end>")
     }
+    //endregion
 }

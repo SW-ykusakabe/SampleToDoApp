@@ -55,7 +55,7 @@ class CalendarPageAdapter(fm: FragmentManager, behavior: Int) : FragmentStatePag
      * forwardData
      * @param date
      */
-    fun forwardData(date: LocalDateTime) {
+    fun forwardMonth(date: LocalDateTime) {
         Log.d(TAG, "forwardData <start>")
         mDate = date
         Log.d(TAG, "forwardData <end>")
@@ -65,9 +65,25 @@ class CalendarPageAdapter(fm: FragmentManager, behavior: Int) : FragmentStatePag
      * rewindData
      * @param date
      */
-    fun rewindData(date: LocalDateTime) {
+    fun rewindMonth(date: LocalDateTime) {
         Log.d(TAG, "rewindData <start>")
         mDate = date.minusDays((count - 3).toLong())
+        Log.d(TAG, "rewindData <end>")
+    }
+
+    /**
+     * forwardData
+     */
+    fun forwardDate() {
+        Log.d(TAG, "forwardData <start>")
+        Log.d(TAG, "forwardData <end>")
+    }
+
+    /**
+     * rewindData
+     */
+    fun rewindDate() {
+        Log.d(TAG, "rewindData <start>")
         Log.d(TAG, "rewindData <end>")
     }
 }

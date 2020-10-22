@@ -15,8 +15,7 @@ import java.time.LocalDateTime
 
 class TaskCalendarPagerFragment: Fragment(), ViewPager.OnPageChangeListener {
     companion object {
-        private val TAG: String = Util.getClassName(tag = object :
-            Any() {}.javaClass.enclosingClass.name)
+        private val TAG: String = Util.getClassName(tag = object : Any() {}.javaClass.enclosingClass.name)
         private const val FORMAT_PATTERN_DATE_ALL: String = "yyyy/MM/dd(e)-HH:mm"
 
         private const val KEY_ARGS_TASK_DATE: String = "ARGS_TASK_DATE"
@@ -118,10 +117,10 @@ class TaskCalendarPagerFragment: Fragment(), ViewPager.OnPageChangeListener {
         }
         if (position == 0) {
             jumpPosition = mScrollSize - 2
-            mAdapter.rewindData(mDisplayedDate)
+            mAdapter.rewindMonth(mDisplayedDate)
         } else if (position == mScrollSize - 1) {
             jumpPosition = 1
-            mAdapter.forwardData(mDisplayedDate)
+            mAdapter.forwardMonth(mDisplayedDate)
         }
         Log.d(TAG, "scrollJump <ndd>")
     }
@@ -146,5 +145,23 @@ class TaskCalendarPagerFragment: Fragment(), ViewPager.OnPageChangeListener {
         view_pager.setCurrentItem(currPos + 1, false)
         scrollJump(currPos)
         Log.d(TAG, "nextMonth <end>")
+    }
+
+    /**
+     * lastDay
+     */
+    fun lastDay() {
+        Log.d(TAG, "lastDay <start>")
+        mAdapter.forwardDate()
+        Log.d(TAG, "lastDay <end>")
+    }
+
+    /**
+     * nextMonth
+     */
+    fun nextDay() {
+        Log.d(TAG, "nextDay <start>")
+        mAdapter.rewindDate()
+        Log.d(TAG, "nextDay <end>")
     }
 }
