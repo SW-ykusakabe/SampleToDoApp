@@ -11,7 +11,6 @@ import com.example.todoapp.R
 import com.example.todoapp.Util
 import com.example.todoapp.models.CalendarAdapter
 import com.example.todoapp.models.OnTaskListListener
-import java.time.LocalDateTime
 
 /**
  * TaskCalendarDateFragment -  Fragment for task calendar
@@ -24,6 +23,7 @@ class TaskCalendarDateFragment: Fragment(), AdapterView.OnItemClickListener {
         private const val KEY_ARGS_TASK_DATE: String = "ARGS_TASK_DATE"
     }
 
+    private lateinit var mGridView: GridView
     private lateinit var mTaskListListener: OnTaskListListener
     private lateinit var mCalendarAdapter: CalendarAdapter
 
@@ -57,10 +57,10 @@ class TaskCalendarDateFragment: Fragment(), AdapterView.OnItemClickListener {
         val dateString = args?.getString(KEY_ARGS_TASK_DATE, Util.getCurrentTimeOfString(FORMAT_PATTERN_DATE_ALL))
         val localDateTime = Util.toLocalDateTime(dateString!!, FORMAT_PATTERN_DATE_ALL)
 
-        val calendarGridView = view.findViewById<GridView>(R.id.calendar_grid_view)
+        mGridView = view.findViewById<GridView>(R.id.calendar_grid_view)
         mCalendarAdapter = CalendarAdapter(view.context, localDateTime)
-        calendarGridView.adapter = mCalendarAdapter
-        calendarGridView.onItemClickListener = this
+        mGridView.adapter = mCalendarAdapter
+        mGridView.onItemClickListener = this
 
         Log.d(TAG, "onCreateView <end>")
         return view
@@ -70,10 +70,35 @@ class TaskCalendarDateFragment: Fragment(), AdapterView.OnItemClickListener {
     override fun onItemClick(parent: AdapterView<*>?, view: View, position: Int, id: Long) {
         Log.d(TAG, "onItemClick <start>")
         Log.d(TAG, "onItemClick : position=$position")
-        mCalendarAdapter.changeColor(view, position)
+        mCalendarAdapter.changeCellColor(view, position)
 
-        val date = Util.toLocalDateTime(mCalendarAdapter.date(position))
-        mTaskListListener.onSelectListToChange(date = date)
+        val date = Util.toLocalDateTime(mCalendarAdapter.getSelectDate(position))
+        mTaskListListener.onSelectDateToChange(date = date)
         Log.d(TAG, "onItemClick <end>")
+    }
+
+    /**
+     * forwardDate
+     */
+    fun forwardDate(count: Int) {
+        Log.d(TAG, "forwardDate <start>")
+        Log.d(TAG, "forwardDate position$count")
+        val targetView: View = mGridView.getChildAt(mCalendarAdapter.getSelectPosition())
+        val position = mCalendarAdapter.forwardDate(targetView, count)
+        mGridView.adapter.getView(mCalendarAdapter.getSelectPosition(), targetView, mGridView)
+        mGridView.adapter.getView(position, targetView, mGridView)
+        Log.d(TAG, "forwardDate <end>")
+    }
+
+    /**
+     * v
+     */
+    fun rewindDate(count: Int) {
+        Log.d(TAG, "rewindDate <start>")
+        Log.d(TAG, "rewindDate position$count")
+        val targetView: View = mGridView.getChildAt(mCalendarAdapter.getSelectPosition())
+        val position = mCalendarAdapter.rewindDate(targetView, count)
+        mGridView.adapter.getView(position, targetView, mGridView)
+        Log.d(TAG, "rewindDate <start>")
     }
 }

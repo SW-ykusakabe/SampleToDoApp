@@ -15,7 +15,8 @@ import java.time.LocalDateTime
 
 class TaskCalendarPagerFragment: Fragment(), ViewPager.OnPageChangeListener {
     companion object {
-        private val TAG: String = Util.getClassName(tag = object : Any() {}.javaClass.enclosingClass.name)
+        private val TAG: String = Util.getClassName(tag = object :
+            Any() {}.javaClass.enclosingClass.name)
         private const val FORMAT_PATTERN_DATE_ALL: String = "yyyy/MM/dd(e)-HH:mm"
 
         private const val KEY_ARGS_TASK_DATE: String = "ARGS_TASK_DATE"
@@ -150,18 +151,26 @@ class TaskCalendarPagerFragment: Fragment(), ViewPager.OnPageChangeListener {
     /**
      * lastDay
      */
-    fun lastDay() {
+    fun lastDay(count: Int) {
         Log.d(TAG, "lastDay <start>")
-        mAdapter.forwardDate()
+        val position: Int = view_pager.currentItem
+        val fragment = mAdapter.instantiateItem(view_pager, position)
+        if (fragment is TaskCalendarDateFragment) {
+            fragment.forwardDate(count)
+        }
         Log.d(TAG, "lastDay <end>")
     }
 
     /**
      * nextMonth
      */
-    fun nextDay() {
+    fun nextDay(count: Int) {
         Log.d(TAG, "nextDay <start>")
-        mAdapter.rewindDate()
+        val position: Int = view_pager.currentItem
+        val fragment = mAdapter.instantiateItem(view_pager, position)
+        if (fragment is TaskCalendarDateFragment) {
+            fragment.rewindDate(count)
+        }
         Log.d(TAG, "nextDay <end>")
     }
 }

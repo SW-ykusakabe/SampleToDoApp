@@ -21,6 +21,7 @@ class CalendarPageAdapter(fm: FragmentManager, behavior: Int) : FragmentStatePag
     }
 
     private lateinit var mDate: LocalDateTime
+    private lateinit var mFragment: TaskCalendarDateFragment
 
     /** @inheritDoc */
     override fun getCount(): Int {
@@ -33,7 +34,8 @@ class CalendarPageAdapter(fm: FragmentManager, behavior: Int) : FragmentStatePag
         val dateStr: String = Util.toString(mDate.plusMonths(position - 1L), FORMAT_PATTERN_DATE_ALL)
         Log.d(TAG, "getItem:$position, time:${mDate.plusMonths(position - 1L)}")
         Log.d(TAG, "getItem <end>")
-        return TaskCalendarDateFragment().newInstance(dateStr)
+        mFragment = TaskCalendarDateFragment().newInstance(dateStr)
+        return mFragment
     }
 
     /** @inheritDoc */
@@ -68,22 +70,6 @@ class CalendarPageAdapter(fm: FragmentManager, behavior: Int) : FragmentStatePag
     fun rewindMonth(date: LocalDateTime) {
         Log.d(TAG, "rewindData <start>")
         mDate = date.minusDays((count - 3).toLong())
-        Log.d(TAG, "rewindData <end>")
-    }
-
-    /**
-     * forwardData
-     */
-    fun forwardDate() {
-        Log.d(TAG, "forwardData <start>")
-        Log.d(TAG, "forwardData <end>")
-    }
-
-    /**
-     * rewindData
-     */
-    fun rewindDate() {
-        Log.d(TAG, "rewindData <start>")
         Log.d(TAG, "rewindData <end>")
     }
 }

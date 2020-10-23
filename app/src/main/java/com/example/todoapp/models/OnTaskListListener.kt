@@ -38,7 +38,7 @@ interface OnTaskListListener {
      * onChangeListItem - Change display list by selection
      * @param date date to change
      */
-    fun onSelectListToChange(date: LocalDateTime)
+    fun onSelectDateToChange(date: LocalDateTime)
 
     /**
      * onChangeListItem - Change the display list by scrolling
