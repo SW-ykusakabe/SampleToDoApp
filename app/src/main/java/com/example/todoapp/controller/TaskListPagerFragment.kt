@@ -68,9 +68,7 @@ class TaskListPagerFragment: Fragment(), ViewPager.OnPageChangeListener {
             val date = Util.toLocalDateTime(dateString, FORMAT_PATTERN_DATE_ALL)
             mAdapter.initializeData(date)
             mDisplayedDate = date
-            val activity = activity as MainActivity
-            activity.setToolBarText(mDisplayedDate)
-
+            (activity as MainActivity).setToolBarText(mDisplayedDate)
         }
 
         mScrollSize = mAdapter.count
@@ -93,7 +91,7 @@ class TaskListPagerFragment: Fragment(), ViewPager.OnPageChangeListener {
         val activity = activity as MainActivity
         val count = position - mPosition
         if(count == 1) {
-            mDisplayedDate = mDisplayedDate.plusDays(1)
+            mDisplayedDate = mDisplayedDate.plusDays(count.toLong())
         } else if(count == -1) {
             mDisplayedDate = mDisplayedDate.minusDays(1)
         }
@@ -145,9 +143,10 @@ class TaskListPagerFragment: Fragment(), ViewPager.OnPageChangeListener {
      */
     fun pagerReload(date: LocalDateTime) {
         Log.d(TAG, "pagerReload <start>")
+        view_pager.setCurrentItem(START_POSITION, false)
         mAdapter.initializeData(date)
         mDisplayedDate = date
-        view_pager.setCurrentItem(START_POSITION, false)
+        (activity as MainActivity).setToolBarText(mDisplayedDate)
         mAdapter.notifyDataSetChanged()
         Log.d(TAG, "pagerReload <end>")
     }

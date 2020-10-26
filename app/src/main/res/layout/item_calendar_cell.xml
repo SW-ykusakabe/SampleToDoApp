@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
     <TextView
         android:id="@+id/date_text"
@@ -10,4 +11,44 @@
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/smallest_padding"/>
 
-</FrameLayout>
+    <View
+        android:id="@+id/first_task_line_view"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/small_height"
+        android:visibility="gone"
+        android:background="@color/colorMediumSeaGreen"/>
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="1dp"/>
+
+    <View
+        android:id="@+id/second_task_line_view"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/small_height"
+        android:visibility="gone"
+        android:background="@color/colorMediumSeaGreen"/>
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="1dp"/>
+
+    <View
+        android:id="@+id/third_task_line_view"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/small_height"
+        android:visibility="gone"
+        android:background="@color/colorMediumSeaGreen"/>
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="1dp"/>
+
+    <View
+        android:id="@+id/fourth_task_line_view"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/small_height"
+        android:visibility="gone"
+        android:background="@color/colorMediumSeaGreen"/>
+
+</LinearLayout>

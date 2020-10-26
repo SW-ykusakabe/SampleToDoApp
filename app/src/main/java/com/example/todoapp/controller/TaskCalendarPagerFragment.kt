@@ -149,28 +149,15 @@ class TaskCalendarPagerFragment: Fragment(), ViewPager.OnPageChangeListener {
     }
 
     /**
-     * lastDay
+     * changeScrollDate
      */
-    fun lastDay(count: Int) {
-        Log.d(TAG, "lastDay <start>")
+    fun changeScrollDate(count: Int) {
+        Log.d(TAG, "changeScrollDate <start>")
         val position: Int = view_pager.currentItem
         val fragment = mAdapter.instantiateItem(view_pager, position)
         if (fragment is TaskCalendarDateFragment) {
-            fragment.forwardDate(count)
+            fragment.changeScrollDate(count)
         }
-        Log.d(TAG, "lastDay <end>")
-    }
-
-    /**
-     * nextMonth
-     */
-    fun nextDay(count: Int) {
-        Log.d(TAG, "nextDay <start>")
-        val position: Int = view_pager.currentItem
-        val fragment = mAdapter.instantiateItem(view_pager, position)
-        if (fragment is TaskCalendarDateFragment) {
-            fragment.rewindDate(count)
-        }
-        Log.d(TAG, "nextDay <end>")
+        Log.d(TAG, "changeScrollDate <end>")
     }
 }

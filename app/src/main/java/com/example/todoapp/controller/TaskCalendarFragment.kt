@@ -85,11 +85,7 @@ class TaskCalendarFragment: Fragment(), View.OnClickListener {
     }
 
     fun dayChange(count: Int) {
-        if (count > 0) {
-            mFragment.lastDay(count)
-        } else {
-            mFragment.nextDay(count)
-        }
+        mFragment.changeScrollDate(count)
     }
 
     /**

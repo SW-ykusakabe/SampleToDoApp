@@ -41,9 +41,11 @@ class CalendarAdapter(private val mContext: Context, private val localDateTime: 
     /** @inheritDoc */
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View? {
         Log.d(TAG, "getView <start>")
+        Log.d(TAG, "getView position=$position")
         var view = convertView
         val holder: ViewHolder
         if (view == null) {
+            Log.d(TAG, "getView convertView is null")
             view = mLayoutInflater.inflate(R.layout.item_calendar_cell, parent, false)
             holder = ViewHolder()
             holder.dateText = view!!.findViewById(R.id.date_text)
@@ -78,6 +80,7 @@ class CalendarAdapter(private val mContext: Context, private val localDateTime: 
             }
             holder.dateText?.setTextColor(colorId)
         } else {
+            Log.d(TAG, "getView convertView is not null")
             holder = view.tag as ViewHolder
         }
         // set display size
@@ -111,22 +114,6 @@ class CalendarAdapter(private val mContext: Context, private val localDateTime: 
         return 0
     }
 
-//    fun nextMonth() {
-//        Log.d(TAG, "nextMonth <start>")
-//        mDateManager.nextMonth()
-//        mDateArray = mDateManager.days
-//        notifyDataSetChanged()
-//        Log.d(TAG, "nextMonth <end>")
-//    }
-//
-//    fun lastMonth() {
-//        Log.d(TAG, "lastMonth <start>")
-//        mDateManager.lastMonth()
-//        mDateArray = mDateManager.days
-//        notifyDataSetChanged()
-//        Log.d(TAG, "lastMonth <end>")
-//    }
-
     /**
      * date
      * @param position
@@ -141,8 +128,8 @@ class CalendarAdapter(private val mContext: Context, private val localDateTime: 
      * @param view
      * @param position
      */
-    fun changeCellColor(view: View, position: Int) {
-        Log.d(TAG, "changeColor <start>")
+    fun changeSelectDate(view: View, position: Int) {
+        Log.d(TAG, "changeSelectDate <start>")
         // TODO :
         if (mDateManager.isCurrentMonth(mDateArray[mPreviouslySelectedPosition])) {
             mPreviouslySelectedView.setBackgroundColor(Color.WHITE)
@@ -156,15 +143,17 @@ class CalendarAdapter(private val mContext: Context, private val localDateTime: 
         }
         mPreviouslySelectedView = view
         mPreviouslySelectedPosition = position
-        Log.d(TAG, "changeColor <end>")
+        Log.d(TAG, "changeSelectDate <end>")
     }
 
     fun getSelectPosition(): Int {
+        Log.d(TAG, "getSelectPosition <start>")
+        Log.d(TAG, "getSelectPosition <end>")
         return mPreviouslySelectedPosition
     }
 
-    fun forwardDate(view: View, count: Int): Int{
-        Log.d(TAG, "forwardDate <start>")
+    fun changeScrollDate(view: View, count: Int) {
+        Log.d(TAG, "changeScrollDate <start>")
         // TODO :
         if (mDateManager.isCurrentMonth(mDateArray[mPreviouslySelectedPosition])) {
             mPreviouslySelectedView.setBackgroundColor(Color.WHITE)
@@ -179,27 +168,6 @@ class CalendarAdapter(private val mContext: Context, private val localDateTime: 
             view.setBackgroundColor(Color.argb(100, 255, 240, 170))
         }
         mPreviouslySelectedView = view
-        Log.d(TAG, "forwardDate <end>")
-        return mPreviouslySelectedPosition
-    }
-
-    fun rewindDate(view: View, count: Int): Int {
-        Log.d(TAG, "rewindDate <start>")
-        // TODO :
-        if (mDateManager.isCurrentMonth(mDateArray[mPreviouslySelectedPosition])) {
-            mPreviouslySelectedView.setBackgroundColor(Color.WHITE)
-        } else {
-            mPreviouslySelectedView.setBackgroundColor(Color.LTGRAY)
-        }
-
-        mPreviouslySelectedPosition +=count
-        if (mDateManager.isCurrentMonth(mDateArray[mPreviouslySelectedPosition])) {
-            view.setBackgroundColor(Color.argb(255, 255, 240, 170))
-        } else {
-            view.setBackgroundColor(Color.argb(100, 255, 240, 170))
-        }
-        mPreviouslySelectedView = view
-        Log.d(TAG, "rewindDate <end>")
-        return mPreviouslySelectedPosition
+        Log.d(TAG, "changeScrollDate <end>")
     }
 }

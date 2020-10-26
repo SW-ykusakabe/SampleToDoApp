@@ -1,5 +1,6 @@
 package com.example.todoapp.controller
 
+import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -70,7 +71,7 @@ class TaskCalendarDateFragment: Fragment(), AdapterView.OnItemClickListener {
     override fun onItemClick(parent: AdapterView<*>?, view: View, position: Int, id: Long) {
         Log.d(TAG, "onItemClick <start>")
         Log.d(TAG, "onItemClick : position=$position")
-        mCalendarAdapter.changeCellColor(view, position)
+        mCalendarAdapter.changeSelectDate(view, position)
 
         val date = Util.toLocalDateTime(mCalendarAdapter.getSelectDate(position))
         mTaskListListener.onSelectDateToChange(date = date)
@@ -78,27 +79,13 @@ class TaskCalendarDateFragment: Fragment(), AdapterView.OnItemClickListener {
     }
 
     /**
-     * forwardDate
+     * changeScrollDate
+     * @param count
      */
-    fun forwardDate(count: Int) {
-        Log.d(TAG, "forwardDate <start>")
-        Log.d(TAG, "forwardDate position$count")
-        val targetView: View = mGridView.getChildAt(mCalendarAdapter.getSelectPosition())
-        val position = mCalendarAdapter.forwardDate(targetView, count)
-        mGridView.adapter.getView(mCalendarAdapter.getSelectPosition(), targetView, mGridView)
-        mGridView.adapter.getView(position, targetView, mGridView)
-        Log.d(TAG, "forwardDate <end>")
-    }
-
-    /**
-     * v
-     */
-    fun rewindDate(count: Int) {
-        Log.d(TAG, "rewindDate <start>")
-        Log.d(TAG, "rewindDate position$count")
-        val targetView: View = mGridView.getChildAt(mCalendarAdapter.getSelectPosition())
-        val position = mCalendarAdapter.rewindDate(targetView, count)
-        mGridView.adapter.getView(position, targetView, mGridView)
-        Log.d(TAG, "rewindDate <start>")
+    fun changeScrollDate(count: Int) {
+        Log.d(TAG, "changeScrollDate <start>")
+        val targetView: View = mGridView.getChildAt(mCalendarAdapter.getSelectPosition() + count)
+        mCalendarAdapter.changeScrollDate(targetView, count)
+        Log.d(TAG, "changeScrollDate <end>")
     }
 }

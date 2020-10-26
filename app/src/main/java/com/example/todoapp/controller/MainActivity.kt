@@ -31,6 +31,10 @@ class MainActivity: AppCompatActivity(), View.OnClickListener, OnTaskListListene
     companion object {
         private val TAG: String = Util.getClassName(object : Any() {}.javaClass.enclosingClass.name)
 
+        private const val VIEW_TASK_LIST: Int = 0
+        private const val VIEW_TASK_CALENDAR: Int = 1
+        private const val VIEW_SETTING: Int = 2
+
         private const val FORMAT_PATTERN_DATE_ALL: String = "yyyy/MM/dd(e)-HH:mm"
         private const val FORMAT_PATTERN_DATE_WEEK: String = "yyyy/MM/dd(E)"
     }
@@ -39,6 +43,7 @@ class MainActivity: AppCompatActivity(), View.OnClickListener, OnTaskListListene
     private lateinit var mUpperFragmentOnActivity: Fragment
     private lateinit var mLowerFragmentOnActivity: Fragment
     private lateinit var mTaskDao: TaskDao
+    private var mScreenDisplay: Int = VIEW_TASK_LIST
     //endregion
 
     //region override
@@ -214,33 +219,48 @@ class MainActivity: AppCompatActivity(), View.OnClickListener, OnTaskListListene
             }
             R.id.calendar_day_button -> {
                 Log.d(TAG, "onClick : clicked calendar_day_button")
-                task_add_button.visibility = View.VISIBLE
                 val currentTimeLocalDateTime = Util.getCurrentLocalDateTime()
-                val dateString = Util.toString(currentTimeLocalDateTime, FORMAT_PATTERN_DATE_ALL)
+                if (mScreenDisplay != VIEW_TASK_LIST) {
+                    mScreenDisplay = VIEW_TASK_LIST
+                    task_add_button.visibility = View.VISIBLE
+                    val dateString =
+                        Util.toString(currentTimeLocalDateTime, FORMAT_PATTERN_DATE_ALL)
 
-                mLowerFragmentOnActivity = TaskListPagerFragment().newInstance(dateString)
-                replaceFragment(mLowerFragmentOnActivity)
+                    mLowerFragmentOnActivity = TaskListPagerFragment().newInstance(dateString)
+                    replaceFragment(mLowerFragmentOnActivity)
+                } else {
+                    (mLowerFragmentOnActivity as TaskListPagerFragment).pagerReload(currentTimeLocalDateTime)
+                }
             }
             R.id.calendar_week_button -> {
                 Log.d(TAG, "onClick : clicked calendar_week_button")
-                task_add_button.visibility = View.VISIBLE
                 val currentTimeLocalDateTime = Util.getCurrentLocalDateTime()
-                val dateString = Util.toString(currentTimeLocalDateTime, FORMAT_PATTERN_DATE_ALL)
+                if (mScreenDisplay != VIEW_TASK_CALENDAR) {
+                    mScreenDisplay = VIEW_TASK_CALENDAR
+                    task_add_button.visibility = View.VISIBLE
+                    val dateString =
+                        Util.toString(currentTimeLocalDateTime, FORMAT_PATTERN_DATE_ALL)
 
-                setToolBarText(date = currentTimeLocalDateTime)
+                    setToolBarText(date = currentTimeLocalDateTime)
 
-                mLowerFragmentOnActivity = TaskListPagerFragment().newInstance(dateString)
-                mUpperFragmentOnActivity = TaskCalendarFragment().newInstance(dateString)
+                    mLowerFragmentOnActivity = TaskListPagerFragment().newInstance(dateString)
+                    mUpperFragmentOnActivity = TaskCalendarFragment().newInstance(dateString)
 //                mUpperFragmentOnActivity = TaskCalendarPagerFragment().newInstance(dateString)
 //                replaceFragment(mUpperFragmentOnActivity)
-                replaceFragment(mUpperFragmentOnActivity, mLowerFragmentOnActivity)
+                    replaceFragment(mUpperFragmentOnActivity, mLowerFragmentOnActivity)
+                } else {
+                    (mLowerFragmentOnActivity as TaskListPagerFragment).pagerReload(currentTimeLocalDateTime)
+                }
             }
             R.id.setting_button -> {
                 Log.d(TAG, "onClick : clicked setting_button")
-                task_add_button.visibility = View.INVISIBLE
-                today_text.text = this.resources.getString(R.string.settings_title)
-                mLowerFragmentOnActivity = SettingsFragment().newInstance()
-                replaceFragment(mLowerFragmentOnActivity)
+                if (mScreenDisplay != VIEW_SETTING) {
+                    mScreenDisplay = VIEW_SETTING
+                    task_add_button.visibility = View.INVISIBLE
+                    today_text.text = this.resources.getString(R.string.settings_title)
+                    mLowerFragmentOnActivity = SettingsFragment().newInstance()
+                    replaceFragment(mLowerFragmentOnActivity)
+                }
             }
             else -> {
 
@@ -262,7 +282,7 @@ class MainActivity: AppCompatActivity(), View.OnClickListener, OnTaskListListene
     }
 
     fun sendDayChanged(count: Int) {
-        if (mUpperFragmentOnActivity is TaskCalendarFragment) {
+        if (mScreenDisplay == VIEW_TASK_CALENDAR && mUpperFragmentOnActivity is TaskCalendarFragment) {
             (mUpperFragmentOnActivity as TaskCalendarFragment).dayChange(count)
         }
     }
