@@ -249,7 +249,8 @@ class MainActivity: AppCompatActivity(), View.OnClickListener, OnTaskListListene
 //                replaceFragment(mUpperFragmentOnActivity)
                     replaceFragment(mUpperFragmentOnActivity, mLowerFragmentOnActivity)
                 } else {
-                    (mLowerFragmentOnActivity as TaskListPagerFragment).pagerReload(currentTimeLocalDateTime)
+//                    (mLowerFragmentOnActivity as TaskListPagerFragment).pagerReload(currentTimeLocalDateTime)
+                    (mUpperFragmentOnActivity as TaskCalendarFragment).pageReload()
                 }
             }
             R.id.setting_button -> {
@@ -282,9 +283,11 @@ class MainActivity: AppCompatActivity(), View.OnClickListener, OnTaskListListene
     }
 
     fun sendDayChanged(count: Int) {
+        Log.d(TAG, "sendDayChanged <start>")
         if (mScreenDisplay == VIEW_TASK_CALENDAR && mUpperFragmentOnActivity is TaskCalendarFragment) {
             (mUpperFragmentOnActivity as TaskCalendarFragment).dayChange(count)
         }
+        Log.d(TAG, "sendDayChanged <end>")
     }
     //endregion
 

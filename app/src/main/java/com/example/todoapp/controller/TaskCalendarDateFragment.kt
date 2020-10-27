@@ -12,6 +12,7 @@ import com.example.todoapp.R
 import com.example.todoapp.Util
 import com.example.todoapp.models.CalendarAdapter
 import com.example.todoapp.models.OnTaskListListener
+import java.time.LocalDate
 
 /**
  * TaskCalendarDateFragment -  Fragment for task calendar
@@ -86,6 +87,18 @@ class TaskCalendarDateFragment: Fragment(), AdapterView.OnItemClickListener {
         Log.d(TAG, "changeScrollDate <start>")
         val targetView: View = mGridView.getChildAt(mCalendarAdapter.getSelectPosition() + count)
         mCalendarAdapter.changeScrollDate(targetView, count)
+        Log.d(TAG, "changeScrollDate <end>")
+    }
+
+    /**
+     * pageReload
+     */
+    fun pageReload() {
+        Log.d(TAG, "changeScrollDate <start>")
+        val position = mCalendarAdapter.getTodayPos()
+        val targetView: View = mGridView.getChildAt(position)
+        mCalendarAdapter.changeSelectDate(targetView, position)
+        Log.d(TAG, "test: date=${mCalendarAdapter.getSelectDate(position)}")
         Log.d(TAG, "changeScrollDate <end>")
     }
 }

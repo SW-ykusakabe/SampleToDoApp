@@ -15,7 +15,6 @@ import java.time.LocalDateTime
  * TaskListPagerFragment - Fragment for task list pager
  */
 class TaskListPagerFragment: Fragment(), ViewPager.OnPageChangeListener {
-
     companion object {
         private val TAG: String = Util.getClassName(tag = object : Any() {}.javaClass.enclosingClass.name)
         private const val FORMAT_PATTERN_DATE_ALL: String = "yyyy/MM/dd(e)-HH:mm"

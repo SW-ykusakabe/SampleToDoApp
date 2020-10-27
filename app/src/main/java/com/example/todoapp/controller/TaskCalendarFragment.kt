@@ -11,6 +11,7 @@ import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
 import com.example.todoapp.R
 import com.example.todoapp.Util
+import java.time.LocalDateTime
 
 /**
  * TaskCalendarFragment -  Fragment for task calendar
@@ -24,6 +25,7 @@ class TaskCalendarFragment: Fragment(), View.OnClickListener {
     }
 
     private lateinit var mFragment: TaskCalendarPagerFragment
+
     /**
      * newInstance - return to this instance
      * @param date　String of today date
@@ -85,7 +87,15 @@ class TaskCalendarFragment: Fragment(), View.OnClickListener {
     }
 
     fun dayChange(count: Int) {
+        Log.d(TAG, "dayChange <start>")
         mFragment.changeScrollDate(count)
+        Log.d(TAG, "dayChange <end>")
+    }
+
+    fun pageReload() {
+        Log.d(TAG, "pageReload <start>")
+        mFragment.pageReload()
+        Log.d(TAG, "pageReload <end>")
     }
 
     /**

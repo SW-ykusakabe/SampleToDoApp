@@ -130,6 +130,7 @@ class CalendarAdapter(private val mContext: Context, private val localDateTime: 
      */
     fun changeSelectDate(view: View, position: Int) {
         Log.d(TAG, "changeSelectDate <start>")
+        Log.d(TAG, "changeSelectDate position=$position")
         // TODO :
         if (mDateManager.isCurrentMonth(mDateArray[mPreviouslySelectedPosition])) {
             mPreviouslySelectedView.setBackgroundColor(Color.WHITE)
@@ -169,5 +170,18 @@ class CalendarAdapter(private val mContext: Context, private val localDateTime: 
         }
         mPreviouslySelectedView = view
         Log.d(TAG, "changeScrollDate <end>")
+    }
+
+    fun getTodayPos(): Int {
+        Log.d(TAG, "getTodayPos <start>")
+        var todayPos: Int = -1
+        for (index in mDateArray.indices) {
+            if (mDateManager.isCurrentDay(mDateArray[index])) {
+                Log.d(TAG, "test: date=${mDateArray[index]}, index=$index")
+                todayPos = index
+            }
+        }
+        Log.d(TAG, "getTodayPos <end>")
+        return todayPos
     }
 }

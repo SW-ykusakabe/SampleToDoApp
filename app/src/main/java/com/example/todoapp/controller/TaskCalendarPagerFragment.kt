@@ -160,4 +160,14 @@ class TaskCalendarPagerFragment: Fragment(), ViewPager.OnPageChangeListener {
         }
         Log.d(TAG, "changeScrollDate <end>")
     }
+
+    fun pageReload() {
+        Log.d(TAG, "pageReload <start>")
+        val position: Int = view_pager.currentItem
+        val fragment = mAdapter.instantiateItem(view_pager, position)
+        if (fragment is TaskCalendarDateFragment) {
+            fragment.pageReload()
+        }
+        Log.d(TAG, "pageReload <end>")
+    }
 }
