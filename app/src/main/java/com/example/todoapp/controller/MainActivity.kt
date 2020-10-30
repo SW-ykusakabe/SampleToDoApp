@@ -205,20 +205,7 @@ class MainActivity: AppCompatActivity(), View.OnClickListener, OnTaskListListene
         Log.d(TAG, "onScrollListToChange <end>")
     }
 
-
-    private fun createNotificationChannel(channelId: String) {
-        val name = "チャンネルの名前"
-        val description = "チャンネルの説明文"
-        val importance = NotificationManager.IMPORTANCE_DEFAULT
-        val channel = NotificationChannel(channelId, name, importance).apply {
-            this.description = description
-        }
-
-        val manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        manager.createNotificationChannel(channel)
-    }
-
-    public fun notification() {
+    fun notification() {
         val intent = Intent(this, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         }
@@ -243,25 +230,53 @@ class MainActivity: AppCompatActivity(), View.OnClickListener, OnTaskListListene
         }
     }
 
+    private fun createNotificationChannel(channelId: String) {
+        val name = "チャンネルの名前"
+        val description = "チャンネルの説明文"
+        val importance = NotificationManager.IMPORTANCE_DEFAULT
+        val channel = NotificationChannel(channelId, name, importance).apply {
+            this.description = description
+        }
+
+        val manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        manager.createNotificationChannel(channel)
+    }
+
+
+    private fun scheduleNotification(content: String, calendar: Calendar) {
+        val notificationIntent = Intent(this, AlarmBroadcastReceiver::class.java)
+        notificationIntent.putExtra(AlarmBroadcastReceiver().NOTIFICATION_ID, 1)
+        notificationIntent.putExtra(AlarmBroadcastReceiver().NOTIFICATION_CONTENT, content)
+        val pendingIntent = PendingIntent.getBroadcast(this,
+            0,
+            notificationIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT)
+        val alarmManager = getSystemService(ALARM_SERVICE) as AlarmManager
+        alarmManager.setExact(AlarmManager.RTC_WAKEUP, calendar.timeInMillis, pendingIntent)
+    }
+
     /** @inheritDoc */
     override fun onClick(v: View) {
         Log.d(TAG, "onClick <start>")
         when (v.id) {
             R.id.task_add_button -> {
-
-
-
-
                 val calendar = Calendar.getInstance()
                 calendar.timeInMillis = System.currentTimeMillis()
-                calendar.add(Calendar.SECOND, 5)
+                calendar.add(Calendar.SECOND, 3)
+                scheduleNotification("10秒後に届く通知です", calendar)
 
-                val intent = Intent(applicationContext, AlarmBroadcastReceiver::class.java)
-                val pending = PendingIntent.getBroadcast(applicationContext, 0, intent, 0)
 
-                val am = getSystemService(ALARM_SERVICE) as AlarmManager
-                am.setExact(AlarmManager.RTC_WAKEUP, calendar.timeInMillis, pending)
-                Toast.makeText(applicationContext, "Set Alarm ", Toast.LENGTH_SHORT).show()
+//                val calendar = Calendar.getInstance()
+//                calendar.timeInMillis = System.currentTimeMillis()
+//                calendar.add(Calendar.SECOND, 5)
+//
+//                val intent = Intent(this, AlarmBroadcastReceiver::class.java)
+//
+//                val pending = PendingIntent.getBroadcast(this, 0, intent, 0)
+//
+//                val am = getSystemService(ALARM_SERVICE) as AlarmManager
+//                am.setExact(AlarmManager.RTC_WAKEUP, calendar.timeInMillis, pending)
+//                Toast.makeText(this, "Set Alarm ", Toast.LENGTH_SHORT).show()
 
 
 
@@ -292,7 +307,8 @@ class MainActivity: AppCompatActivity(), View.OnClickListener, OnTaskListListene
                     mLowerFragmentOnActivity = TaskListPagerFragment().newInstance(dateString)
                     replaceFragment(mLowerFragmentOnActivity)
                 } else {
-                    (mLowerFragmentOnActivity as TaskListPagerFragment).pagerReload(currentTimeLocalDateTime)
+                    (mLowerFragmentOnActivity as TaskListPagerFragment).pagerReload(
+                        currentTimeLocalDateTime)
                 }
             }
             R.id.calendar_week_button -> {

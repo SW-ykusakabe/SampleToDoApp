@@ -28,7 +28,8 @@ class TaskListPagerFragment: Fragment(), ViewPager.OnPageChangeListener {
     private lateinit var mDisplayedDate: LocalDateTime
     private var mPosition = -1
     private var mScrollSize = -1
-    private var jumpPosition = -1
+    private var mJumpPosition = -1
+    private var mPageSelectedByJump = false
 
     /**
      * newInstance - return to this instance
@@ -85,29 +86,33 @@ class TaskListPagerFragment: Fragment(), ViewPager.OnPageChangeListener {
     override fun onPageSelected(position: Int) {
         Log.d(TAG, "onPageSelected <start>")
         Log.d(TAG, "onPageSelected : position:$position")
-
-        // display date
-        val activity = activity as MainActivity
-        val count = position - mPosition
-        if(count == 1) {
-            mDisplayedDate = mDisplayedDate.plusDays(count.toLong())
-        } else if(count == -1) {
-            mDisplayedDate = mDisplayedDate.minusDays(1)
+        if (!mPageSelectedByJump) {
+            // display date
+            val activity = activity as MainActivity
+            val count = position - mPosition
+            if (count == 1) {
+                mDisplayedDate = mDisplayedDate.plusDays(count.toLong())
+            } else if (count == -1) {
+                mDisplayedDate = mDisplayedDate.minusDays(1)
+            }
+            activity.setToolBarText(mDisplayedDate)
+            activity.sendDayChanged(count)
         }
-        activity.setToolBarText(mDisplayedDate)
-        activity.sendDayChanged(count)
         mPosition = position
+        mPageSelectedByJump = false
 
         // scroll jump
         if (mScrollSize == -1) {
             mScrollSize = mAdapter.count
         }
         if (position == 0) {
-            jumpPosition = mScrollSize - 2
+            mJumpPosition = mScrollSize - 2
             mAdapter.rewindData(mDisplayedDate)
+            mPageSelectedByJump = true
         } else if (position == mScrollSize - 1) {
-            jumpPosition = 1
+            mJumpPosition = 1
             mAdapter.forwardData(mDisplayedDate)
+            mPageSelectedByJump = true
         }
         Log.d(TAG, "onPageSelected <end>")
     }
@@ -120,9 +125,9 @@ class TaskListPagerFragment: Fragment(), ViewPager.OnPageChangeListener {
     override fun onPageScrollStateChanged(state: Int) {
         Log.d(TAG, "onPageScrollStateChanged <start>")
         Log.d(TAG, "onPageScrollStateChanged : state:$state")
-        if (state == ViewPager.SCROLL_STATE_IDLE && jumpPosition >= 0) {
-            view_pager.setCurrentItem(jumpPosition, false)
-            jumpPosition = -1
+        if (state == ViewPager.SCROLL_STATE_IDLE && mJumpPosition >= 0) {
+            view_pager.setCurrentItem(mJumpPosition, false)
+            mJumpPosition = -1
         }
         Log.d(TAG, "onPageScrollStateChanged <end>")
     }
